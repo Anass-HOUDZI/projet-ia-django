@@ -95,14 +95,30 @@
     <!-- Mobile Header -->
     <header class="md:hidden bg-coffee-50/90 backdrop-blur-md border-b border-sage-100 p-3 flex items-center justify-between z-40 relative h-[70px]">
         <a href="/" class="flex items-center gap-2">
-            <!-- Logo Image removed as requested, using fallback only -->
-            <div class="flex w-8 h-8 rounded-xl bg-sage-700 items-center justify-center text-white font-serif font-bold text-sm shadow-md">CN</div>
+            <!-- Compact Logo -->
+            <div class="flex w-8 h-8 rounded-xl bg-sage-100 items-center justify-center text-sage-700 shadow-sm border border-sage-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h13.5a4.5 4.5 0 110 9H6a2 2 0 01-2-2V8z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4v1m4-1v1m4-1v1"></path>
+                </svg>
+            </div>
             <span class="font-serif font-bold text-lg text-sage-900 tracking-tight leading-none">Café des<br>Nations</span>
         </a>
         
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+            <!-- Language Selector (Mobile) -->
+            <select onchange="changeLanguage(this.value)" class="bg-white border border-sage-200 text-sage-700 text-xs rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-1.5 shadow-sm">
+                <option value="fr">FR</option>
+                <option value="en">EN</option>
+                <option value="ar">AR</option>
+                <option value="es">ES</option>
+                <option value="pt">PT</option>
+                <option value="ru">RU</option>
+                <option value="zh">ZH</option>
+                <option value="uk">UK</option>
+            </select>
             <!-- Emergency Mode Mobile -->
-            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-600 border border-red-100 shadow-sm" title="Mode Urgence">
+            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-red-600 text-white border border-red-700 shadow-sm animate-pulse hover:bg-red-700 transition-colors" title="Besoin d'aide immédiate ? Contacts d'associations et numéros d'urgence">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             </button>
         </div>
@@ -129,10 +145,21 @@
                 </a>
             </div>
             
-            <!-- Tools: Emergency -->
-            <div class="px-6 py-4 flex gap-2 relative">
-                <button class="flex-none flex items-center justify-center w-full h-10 bg-red-50 border border-red-100 text-red-600 rounded-xl hover:bg-red-100 transition-colors shadow-sm" title="Urgence OQTF / Perte">
-                    🚨 Urgence
+            <!-- Language & Emergency -->
+            <div class="px-6 py-4 flex flex-col gap-3 relative border-b border-sage-100/50">
+                <select onchange="changeLanguage(this.value)" id="desktop-lang-select" class="w-full bg-white border border-sage-200 text-sage-700 text-sm rounded-xl focus:ring-brand-500 focus:border-brand-500 block p-2 shadow-sm">
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="pt">🇵🇹 Português</option>
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="zh">🇨🇳 中文</option>
+                    <option value="uk">🇺🇦 Українська</option>
+                </select>
+                
+                <button class="flex-none flex items-center justify-center w-full h-10 bg-red-600 text-white border border-red-700 rounded-xl hover:bg-red-700 transition-colors shadow-sm animate-pulse" title="Besoin d'aide immédiate ? Contacts d'associations et numéros d'urgence">
+                    🚨 Mode Urgence
                 </button>
             </div>
 
@@ -217,5 +244,265 @@
     </nav>
     
     {% block extra_scripts %}{% endblock %}
+    
+    <!-- Client-side Translation & RTL Script -->
+    <script>
+        function changeLanguage(langCode) {
+            localStorage.setItem('preferred_language', langCode);
+            
+            // Sync all selectors
+            document.querySelectorAll('select').forEach(sel => {
+                if (sel.querySelector(`option[value="${langCode}"]`)) {
+                    sel.value = langCode;
+                }
+            });
+            
+            // RTL Logic for Arabic
+            if (langCode === 'ar') {
+                document.documentElement.setAttribute('dir', 'rtl');
+                document.documentElement.lang = 'ar';
+                // Adjust specific flex/margin directions that might not use logical properties
+                document.querySelectorAll('.flex-row').forEach(el => el.classList.add('flex-row-reverse'));
+                // Just a mock for demonstration
+            } else {
+                document.documentElement.setAttribute('dir', 'ltr');
+                document.documentElement.lang = langCode;
+                document.querySelectorAll('.flex-row-reverse').forEach(el => el.classList.remove('flex-row-reverse'));
+            }
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('preferred_language') || 'fr';
+            changeLanguage(savedLang);
+            
+            // Onboarding Logic
+            const profile = localStorage.getItem('cn_profile');
+            if (!profile) {
+                setTimeout(() => {
+                    document.getElementById('onboarding-modal').classList.remove('hidden');
+                }, 1500);
+            }
+        });
+
+        // Onboarding Functions
+        let currentStep = 1;
+        const profileData = {
+            nationality: '',
+            status: '',
+            priorities: []
+        };
+
+        function closeOnboarding() {
+            document.getElementById('onboarding-modal').classList.add('hidden');
+        }
+
+        function openOnboarding() {
+            currentStep = 1;
+            updateOnboardingUI();
+            document.getElementById('onboarding-modal').classList.remove('hidden');
+        }
+
+        function nextStep() {
+            if (currentStep === 1) {
+                profileData.nationality = document.getElementById('ob-country').value;
+            } else if (currentStep === 2) {
+                const checked = document.querySelector('input[name="ob_status"]:checked');
+                if(checked) profileData.status = checked.value;
+            }
+            
+            if (currentStep < 4) {
+                currentStep++;
+                updateOnboardingUI();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateOnboardingUI();
+            }
+        }
+
+        function finishOnboarding() {
+            // Collect priorities
+            profileData.priorities = Array.from(document.querySelectorAll('input[name="ob_priority"]:checked')).map(cb => cb.value);
+            profileData.profile_completed = true;
+            profileData.last_updated = new Date().toISOString();
+            
+            localStorage.setItem('cn_profile', JSON.stringify(profileData));
+            
+            // Generate tasks for Carnet based on profile
+            let tasks = JSON.parse(localStorage.getItem('cn_checklist')) || [];
+            if(tasks.length === 0) { // Only prefill if empty
+                if(profileData.status === 'etudiant') {
+                    tasks.push({id: Date.now()+1, text: "Payer la CVEC", completed: false});
+                    tasks.push({id: Date.now()+2, text: "Valider mon VLS-TS étudiant", completed: false});
+                }
+                if(profileData.status === 'salarie') {
+                    tasks.push({id: Date.now()+3, text: "Vérifier l'autorisation de travail employeur", completed: false});
+                }
+                if(profileData.priorities.includes('logement')) {
+                    tasks.push({id: Date.now()+4, text: "Monter mon dossier Visale (Garant)", completed: false});
+                }
+                if(tasks.length > 0) {
+                    localStorage.setItem('cn_checklist', JSON.stringify(tasks));
+                }
+            }
+            
+            closeOnboarding();
+            // Optional: reload to apply filters if they are on map
+            if(window.location.pathname.includes('map') || window.location.pathname.includes('carnet')) {
+                window.location.reload();
+            }
+        }
+
+        function updateOnboardingUI() {
+            document.querySelectorAll('.ob-step').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`ob-step-${currentStep}`).classList.remove('hidden');
+        }
+    </script>
+
+    <!-- Onboarding Modal -->
+    <div id="onboarding-modal" class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-sage-900/40 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg border border-sage-100 overflow-hidden relative">
+            <button onclick="closeOnboarding()" class="absolute top-4 right-4 text-sage-400 hover:text-sage-700 font-medium text-sm">Passer</button>
+            
+            <!-- Step 1 -->
+            <div id="ob-step-1" class="ob-step p-8">
+                <div class="text-4xl mb-4">👋</div>
+                <h2 class="text-2xl font-serif font-bold text-sage-900 mb-2">Bonjour !</h2>
+                <p class="text-coffee-800 mb-6">Installez-vous. Pour bien vous servir, dites-nous de quel coin du monde vous arrivez ?</p>
+                
+                <select id="ob-country" class="w-full bg-coffee-50 border border-sage-200 text-sage-900 rounded-xl p-3 mb-6 focus:ring-brand-500 focus:border-brand-500">
+                    <option value="MA">🇲🇦 Maroc</option>
+                    <option value="DZ">🇩🇿 Algérie</option>
+                    <option value="TN">🇹🇳 Tunisie</option>
+                    <option value="SN">🇸🇳 Sénégal</option>
+                    <option value="CI">🇨🇮 Côte d'Ivoire</option>
+                    <option value="UA">🇺🇦 Ukraine</option>
+                    <option value="AUTRE">🌍 Autre</option>
+                </select>
+                
+                <div class="flex items-start gap-3 p-4 bg-brand-50 rounded-xl text-sm text-brand-700 mb-8 border border-brand-100">
+                    <span>💡</span>
+                    <p>Cela nous aide à adapter les infos sur vos accords bilatéraux et visas.</p>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button onclick="nextStep()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">Suivant ➔</button>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div id="ob-step-2" class="ob-step p-8 hidden">
+                <div class="text-4xl mb-4">🎒</div>
+                <h2 class="text-2xl font-serif font-bold text-sage-900 mb-2">Et actuellement...</h2>
+                <p class="text-coffee-800 mb-6">Quel est votre statut en France ?</p>
+                
+                <div class="space-y-3 mb-8">
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sage-200 cursor-pointer hover:bg-sage-50 transition-colors">
+                        <input type="radio" name="ob_status" value="etudiant" class="text-brand-600 focus:ring-brand-500">
+                        <span>🎓 Je suis étudiant(e)</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sage-200 cursor-pointer hover:bg-sage-50 transition-colors">
+                        <input type="radio" name="ob_status" value="salarie" class="text-brand-600 focus:ring-brand-500">
+                        <span>💼 Je suis salarié(e)</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sage-200 cursor-pointer hover:bg-sage-50 transition-colors">
+                        <input type="radio" name="ob_status" value="asile" class="text-brand-600 focus:ring-brand-500">
+                        <span>🕊️ Demande d'asile</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sage-200 cursor-pointer hover:bg-sage-50 transition-colors">
+                        <input type="radio" name="ob_status" value="famille" class="text-brand-600 focus:ring-brand-500">
+                        <span>👨‍👩‍👧 Regroupement familial</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sage-200 cursor-pointer hover:bg-sage-50 transition-colors">
+                        <input type="radio" name="ob_status" value="autre" class="text-brand-600 focus:ring-brand-500">
+                        <span>☕ Autre (je vous expliquerai !)</span>
+                    </label>
+                </div>
+                
+                <div class="flex justify-between">
+                    <button onclick="prevStep()" class="text-sage-500 hover:text-sage-700 font-bold py-3 px-4">⬅ Retour</button>
+                    <button onclick="nextStep()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">Suivant ➔</button>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div id="ob-step-3" class="ob-step p-8 hidden">
+                <div class="text-4xl mb-4">📝</div>
+                <h2 class="text-2xl font-serif font-bold text-sage-900 mb-2">La commande du jour</h2>
+                <p class="text-coffee-800 mb-6">De quoi avez-vous besoin en priorité aujourd'hui ? <br><span class="text-sm opacity-70">(Plusieurs choix possibles)</span></p>
+                
+                <div class="space-y-3 mb-8">
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sage-200 cursor-pointer hover:bg-sage-50 transition-colors">
+                        <input type="checkbox" name="ob_priority" value="titre_sejour" class="text-brand-600 focus:ring-brand-500 rounded">
+                        <span>📜 Mon titre de séjour (Renouvellement/Premier)</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sage-200 cursor-pointer hover:bg-sage-50 transition-colors">
+                        <input type="checkbox" name="ob_priority" value="logement" class="text-brand-600 focus:ring-brand-500 rounded">
+                        <span>🏠 Trouver ou gérer un logement</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sage-200 cursor-pointer hover:bg-sage-50 transition-colors">
+                        <input type="checkbox" name="ob_priority" value="emploi" class="text-brand-600 focus:ring-brand-500 rounded">
+                        <span>💼 Trouver un emploi ou stage</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sage-200 cursor-pointer hover:bg-sage-50 transition-colors">
+                        <input type="checkbox" name="ob_priority" value="sante" class="text-brand-600 focus:ring-brand-500 rounded">
+                        <span>🏥 Ma santé (Carte vitale, mutuelle)</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sage-200 cursor-pointer hover:bg-sage-50 transition-colors">
+                        <input type="checkbox" name="ob_priority" value="francais" class="text-brand-600 focus:ring-brand-500 rounded">
+                        <span>🗣️ Apprendre le français</span>
+                    </label>
+                </div>
+                
+                <div class="flex justify-between">
+                    <button onclick="prevStep()" class="text-sage-500 hover:text-sage-700 font-bold py-3 px-4">⬅ Retour</button>
+                    <button onclick="nextStep()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">Valider ✔</button>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div id="ob-step-4" class="ob-step p-8 hidden">
+                <div class="text-4xl mb-4">🧾</div>
+                <h2 class="text-2xl font-serif font-bold text-sage-900 mb-2">Voici votre commande !</h2>
+                <p class="text-coffee-800 mb-6">Tout est prêt pour vous faciliter la vie.</p>
+                
+                <div class="space-y-4 mb-8">
+                    <div class="flex gap-4 p-4 bg-coffee-50 rounded-xl border border-sage-100">
+                        <span class="text-2xl">📓</span>
+                        <div>
+                            <h4 class="font-bold text-sage-900">Votre carnet est à jour</h4>
+                            <p class="text-sm text-sage-600 mb-2">J'y ai glissé des démarches pertinentes pour vous.</p>
+                            <a href="/carnet/" class="text-sm font-bold text-brand-600 hover:text-brand-700">Voir mon Carnet →</a>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 p-4 bg-coffee-50 rounded-xl border border-sage-100">
+                        <span class="text-2xl">📍</span>
+                        <div>
+                            <h4 class="font-bold text-sage-900">Vos guichets sont filtrés</h4>
+                            <p class="text-sm text-sage-600 mb-2">La carte affiche les lieux clés pour vos priorités.</p>
+                            <a href="/map/" class="text-sm font-bold text-brand-600 hover:text-brand-700">Ouvrir la Carte →</a>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 p-4 bg-coffee-50 rounded-xl border border-sage-100">
+                        <span class="text-2xl">☕</span>
+                        <div>
+                            <h4 class="font-bold text-sage-900">Le Barista est briefé</h4>
+                            <p class="text-sm text-sage-600 mb-2">Il connaît votre statut et ajustera ses réponses.</p>
+                            <a href="/ai/" class="text-sm font-bold text-brand-600 hover:text-brand-700">Discuter avec l'IA →</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button onclick="finishOnboarding()" class="bg-sage-900 hover:bg-sage-800 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-lg">Fermer et boire mon café ☕</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </body>
 </html>

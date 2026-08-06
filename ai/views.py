@@ -29,6 +29,7 @@ def send_message(request):
             data = json.loads(request.body)
             conversation_id = data.get('conversation_id')
             content = data.get('content')
+            image_base64 = data.get('image_base64')
             
             conversation = Conversation.objects.get(id=conversation_id)
             
@@ -41,7 +42,15 @@ def send_message(request):
             
             # Generate AI response
             chatbot = ChatbotService()
-            ai_response = chatbot.generate_response(conversation)
+            # On passe current_message et image_base64 pour éviter de doubler le message s'il n'y a pas d'image
+            # Mais si on l'a déjà sauvegardé en DB, on n'a pas besoin de le repasser si y'a pas d'image
+            # S'il y a une image, on passe le dernier message en mode hybride.
+            # Pour faire simple, comme db_messages contient déjà le message, on le supprime de api_messages dans generate_response
+            # Ah, modifions la façon d'appeler : on ne sauvegarde PAS le message utilisateur AVANT si on a une image ?
+            # Non, c'est mieux de le garder en DB (texte seul)
+            # En fait j'ai modifié service.py pour prendre current_message, mais s'il est déjà en db, il va être envoyé 2 fois.
+            # Changeons le comportement : on passe tout au chatbot.
+            ai_response = chatbot.generate_response(conversation, current_message=content if image_base64 else None, image_base64=image_base64)
             
             return JsonResponse({'status': 'success', 'reply': ai_response})
             

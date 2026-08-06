@@ -46,6 +46,16 @@
                 </button>
             </form>
             
+            <div class="flex items-center justify-between mt-3">
+                <p id="results-counter" class="text-xs font-bold text-sage-700 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm border border-sage-200">
+                    Calcul des guichets...
+                </p>
+                <button id="btn-locate" class="flex items-center gap-2 bg-white text-sage-700 hover:text-brand-600 hover:bg-brand-50 px-3 py-1.5 rounded-lg shadow-sm border border-sage-200 text-xs font-bold transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Autour de moi
+                </button>
+            </div>
+            
             <!-- Quick Filters (Chips) -->
             <div class="flex gap-2 mt-3 overflow-x-auto pb-2 scrollbar-hide" id="filters-container">
                 <button data-type="Préfecture" class="filter-chip shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">Préfectures</button>
@@ -129,6 +139,23 @@
         let activeFilter = null;
         let activeSearch = '';
 
+        // Read profile for default filter
+        const obProfile = JSON.parse(localStorage.getItem('cn_profile'));
+        if (obProfile) {
+            if (obProfile.priorities.includes('sante')) activeFilter = 'Assurance Maladie';
+            else if (obProfile.status === 'etudiant') activeFilter = 'CROUS';
+            else if (obProfile.priorities.includes('titre_sejour')) activeFilter = 'Préfecture';
+            
+            // Set UI chip active
+            if (activeFilter) {
+                setTimeout(() => {
+                    document.querySelectorAll('.filter-chip').forEach(c => {
+                        if(c.dataset.type === activeFilter) c.classList.add('active');
+                    });
+                }, 100);
+            }
+        }
+
         const poiPanel = document.getElementById('poi-detail');
 
         function openPoiDetail(poi) {
@@ -173,6 +200,7 @@
             closePoiDetail();
             
             let bounds = [];
+            let visibleCount = 0;
             
             allPois.forEach(poi => {
                 // Apply filters
@@ -186,6 +214,7 @@
                     if (!matchCity && !matchZip && !matchName) return;
                 }
                 
+                visibleCount++;
                 let color = poi.wait_time_minutes > 60 ? '#E8622C' : (poi.wait_time_minutes > 30 ? '#F4A950' : '#2F5D50');
                 
                 const marker = L.circleMarker([poi.latitude, poi.longitude], {
@@ -203,14 +232,45 @@
                 bounds.push([poi.latitude, poi.longitude]);
             });
             
+            document.getElementById('results-counter').innerText = visibleCount + (visibleCount > 1 ? " guichets trouvés" : " guichet trouvé");
+            
             // Auto zoom to fit markers
-            if (bounds.length > 0) {
+            if (bounds.length > 0 && !isLocating) {
                 map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
-            } else {
+            } else if (!isLocating) {
                 // Default view if no results
                 map.setView([46.2276, 2.2137], 6);
             }
         }
+
+        let isLocating = false;
+        function locateUser() {
+            if ("geolocation" in navigator) {
+                isLocating = true;
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    map.setView([lat, lng], 13);
+                    
+                    // Add a dot for the user
+                    L.circleMarker([lat, lng], {
+                        radius: 6,
+                        fillColor: '#3B82F6', // Blue for user
+                        color: '#fff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 1
+                    }).addTo(map).bindPopup("Vous êtes ici").openPopup();
+                    
+                    isLocating = false;
+                }, (error) => {
+                    console.log("Géolocalisation refusée ou indisponible", error);
+                    isLocating = false;
+                });
+            }
+        }
+
+        document.getElementById('btn-locate').addEventListener('click', locateUser);
 
         // Fetch POIs
         fetch('/map/api/pois/')
@@ -218,10 +278,9 @@
             .then(data => {
                 if(data.status === 'success') {
                     allPois = data.pois;
-                    // Start centered on Paris bounds manually since they asked for it in general
                     renderMap();
-                    // Initial zoom out slightly after initial render to show France if no search
-                    map.setView([46.2276, 2.2137], 6);
+                    // Ask for location on first load
+                    locateUser();
                 }
             })
             .catch(err => console.error(err));
@@ -230,6 +289,7 @@
         document.getElementById('search-form').addEventListener('submit', (e) => {
             e.preventDefault();
             activeSearch = document.getElementById('search-input').value.trim();
+            isLocating = false; // reset location lock so it zooms to search bounds
             renderMap();
         });
         
@@ -248,6 +308,7 @@
                     e.target.classList.add('active');
                 }
                 
+                isLocating = false; // reset
                 renderMap();
             });
         });

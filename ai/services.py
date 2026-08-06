@@ -23,22 +23,44 @@ class ChatbotService:
             "5. Demande des précisions sur le profil si besoin (étudiant, passeport talent, etc.) de manière conversationnelle."
         )
 
-    def generate_response(self, conversation):
+    def generate_response(self, conversation, current_message=None, image_base64=None):
         """
         Génère une réponse à partir de l'historique de la conversation.
+        Accepte un message courant non sauvegardé et une image optionnelle.
         """
         # Récupérer l'historique des messages
         db_messages = conversation.messages.order_by('timestamp')
         
         # Préparer les messages pour l'API
         api_messages = [{"role": "system", "content": self.system_prompt}]
-        for msg in db_messages:
+        
+        # Si current_message est fourni, le dernier message db (qui vient d'être sauvegardé) doit être ignoré dans la boucle
+        db_messages_list = list(db_messages)
+        if current_message and db_messages_list:
+            db_messages_list = db_messages_list[:-1]
+
+        for msg in db_messages_list:
             # Mistral et OpenAI n'acceptent pas le rôle "ai", il faut utiliser "assistant"
             if msg.role == 'ai':
                 api_messages.append({"role": "assistant", "content": msg.content})
             elif msg.role == 'user':
                 api_messages.append({"role": "user", "content": msg.content})
             # On ignore les messages techniques 'system' sauvegardés en base pour ne pas polluer l'IA
+
+        # Ajouter le message courant s'il y a une image (car il n'est pas encore en base avec l'image)
+        if current_message:
+            if image_base64:
+                # Mode Vision
+                self.model = "pixtral-12b-2409"
+                vision_content = [
+                    {"type": "text", "text": current_message},
+                    {"type": "image_url", "image_url": {"url": image_base64}}
+                ]
+                api_messages.append({"role": "user", "content": vision_content})
+                # Surcharge du prompt pour l'analyse de doc
+                api_messages[0]["content"] += "\nL'utilisateur a envoyé une image d'un courrier administratif. Extrais: 1. Type de document, 2. Échéances, 3. Actions requises. Format clair. Ajoute un avertissement de toujours vérifier l'original."
+            else:
+                api_messages.append({"role": "user", "content": current_message})
 
         try:
             response = self.client.chat.completions.create(

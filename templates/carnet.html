@@ -20,9 +20,15 @@
 {% block content %}
     <main class="flex-1 max-w-5xl mx-auto w-full p-4 md:p-8 overflow-y-auto">
         
-        <div class="px-6 py-8">
-            <h1 class="text-3xl font-extrabold text-sage-900 tracking-tight mb-2 font-serif">Mon Carnet 📓</h1>
-            <p class="text-coffee-800 text-sm">Retrouvez ici l'historique de vos échanges avec le Barista.</p>
+        <div class="px-6 py-8 flex items-start justify-between">
+            <div>
+                <h1 class="text-3xl font-extrabold text-sage-900 tracking-tight mb-2 font-serif">Mon Carnet 📓</h1>
+                <p class="text-coffee-800 text-sm">Retrouvez ici l'historique de vos échanges avec le Barista.</p>
+            </div>
+            <button onclick="openOnboarding()" class="hidden md:flex items-center gap-2 bg-white hover:bg-coffee-50 text-brand-600 border border-brand-200 px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                Ma commande
+            </button>
         </div>
 
         <div class="flex flex-col gap-6 animate-fade-in-up" style="animation-delay: 0.1s;">
@@ -66,35 +72,27 @@
 
                 <!-- Checklist -->
                 <div class="bg-white rounded-3xl p-6 border border-sage-100 shadow-card">
-                    <h3 class="font-bold text-lg text-sage-900 flex items-center gap-2 mb-4">
-                        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                        Ma Checklist d'Arrivée (Exemple)
-                    </h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-sage-900 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                            Ma Checklist d'Arrivée
+                        </h3>
+                        <span id="progress-text" class="text-sm font-bold text-brand-600">0%</span>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-sage-100 rounded-full h-2.5 mb-6 overflow-hidden">
+                      <div id="progress-bar" class="bg-brand-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    
+                    <!-- Input to add task -->
+                    <form id="add-task-form" class="flex gap-2 mb-4">
+                        <input type="text" id="new-task-input" placeholder="Ajouter une démarche..." class="flex-1 bg-coffee-50 border border-sage-200 text-sage-900 text-sm rounded-xl focus:ring-brand-500 focus:border-brand-500 px-3 py-2" required>
+                        <button type="submit" class="bg-sage-800 hover:bg-sage-900 text-white rounded-xl px-4 py-2 text-sm font-bold transition-colors">Ajouter</button>
+                    </form>
                     
                     <div class="space-y-2" id="checklist">
-                        <label class="checklist-item flex items-center gap-3 p-3 rounded-xl hover:bg-coffee-50 cursor-pointer transition-colors border border-transparent hover:border-sage-100">
-                            <input type="checkbox" class="peer sr-only" onchange="toggleChecklist(this)">
-                            <div class="w-5 h-5 rounded border border-sage-300 flex items-center justify-center check-icon transition-colors">
-                                <svg class="w-3.5 h-3.5 opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <span class="font-medium text-sm text-coffee-900 transition-colors">Ouvrir un compte bancaire</span>
-                        </label>
-                        
-                        <label class="checklist-item flex items-center gap-3 p-3 rounded-xl hover:bg-coffee-50 cursor-pointer transition-colors border border-transparent hover:border-sage-100">
-                            <input type="checkbox" class="peer sr-only" onchange="toggleChecklist(this)">
-                            <div class="w-5 h-5 rounded border border-sage-300 flex items-center justify-center check-icon transition-colors">
-                                <svg class="w-3.5 h-3.5 opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <span class="font-medium text-sm text-coffee-900 transition-colors">S'inscrire à la Sécurité Sociale (CPAM)</span>
-                        </label>
-                        
-                        <label class="checklist-item flex items-center gap-3 p-3 rounded-xl hover:bg-coffee-50 cursor-pointer transition-colors border border-transparent hover:border-sage-100">
-                            <input type="checkbox" class="peer sr-only" onchange="toggleChecklist(this)">
-                            <div class="w-5 h-5 rounded border border-sage-300 flex items-center justify-center check-icon transition-colors">
-                                <svg class="w-3.5 h-3.5 opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <span class="font-medium text-sm text-coffee-900 transition-colors">Valider mon visa VLS-TS</span>
-                        </label>
+                        <!-- Items will be generated here by JS -->
                     </div>
                 </div>
                 
@@ -103,14 +101,90 @@
     </main>
 
     <script>
-        function toggleChecklist(checkbox) {
-            const item = checkbox.closest('.checklist-item');
-            if (checkbox.checked) {
-                item.classList.add('done');
-            } else {
-                item.classList.remove('done');
-            }
+        // Checklist logic using localStorage
+        const checklistContainer = document.getElementById('checklist');
+        const addTaskForm = document.getElementById('add-task-form');
+        const newTaskInput = document.getElementById('new-task-input');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        
+        let tasks = JSON.parse(localStorage.getItem('cn_checklist')) || [
+            { id: 1, text: "Ouvrir un compte bancaire", completed: false },
+            { id: 2, text: "S'inscrire à la Sécurité Sociale (CPAM)", completed: false },
+            { id: 3, text: "Valider mon visa VLS-TS", completed: false }
+        ];
+        
+        function saveTasks() {
+            localStorage.setItem('cn_checklist', JSON.stringify(tasks));
+            renderTasks();
         }
 
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if(task) {
+                task.completed = !task.completed;
+                saveTasks();
+            }
+        }
+        
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+        }
+
+        function updateProgress() {
+            if(tasks.length === 0) {
+                progressBar.style.width = '0%';
+                progressText.innerText = '0%';
+                return;
+            }
+            const completedCount = tasks.filter(t => t.completed).length;
+            const percentage = Math.round((completedCount / tasks.length) * 100);
+            progressBar.style.width = percentage + '%';
+            progressText.innerText = percentage + '%';
+        }
+
+        function renderTasks() {
+            checklistContainer.innerHTML = '';
+            
+            tasks.forEach(task => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `checklist-item flex items-center justify-between p-3 rounded-xl hover:bg-coffee-50 transition-colors border border-transparent hover:border-sage-100 ${task.completed ? 'done' : ''}`;
+                
+                itemDiv.innerHTML = `
+                    <label class="flex items-center gap-3 cursor-pointer flex-1">
+                        <input type="checkbox" class="peer sr-only" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                        <div class="w-5 h-5 rounded border border-sage-300 flex items-center justify-center check-icon transition-colors">
+                            <svg class="w-3.5 h-3.5 opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <span class="font-medium text-sm text-coffee-900 transition-colors">${task.text}</span>
+                    </label>
+                    <button onclick="deleteTask(${task.id})" class="text-sage-300 hover:text-red-500 p-1" title="Supprimer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                
+                checklistContainer.appendChild(itemDiv);
+            });
+            
+            updateProgress();
+        }
+
+        addTaskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = newTaskInput.value.trim();
+            if(text) {
+                tasks.push({
+                    id: Date.now(),
+                    text: text,
+                    completed: false
+                });
+                newTaskInput.value = '';
+                saveTasks();
+            }
+        });
+
+        // Initial render
+        renderTasks();
     </script>
 {% endblock %}
