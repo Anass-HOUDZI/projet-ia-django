@@ -14,3 +14,7 @@ db.sqlite3
 
 # UV
 uv.lock
+
+# Custom project additions
+node_modules/
+.env
