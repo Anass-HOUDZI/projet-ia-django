@@ -93,8 +93,22 @@
                     <h3 class="font-bold text-xl text-sage-900 flex items-center gap-3">
                         <span class="text-2xl">☕</span> Votre Carte de Fidélité
                     </h3>
-                    <div class="bg-brand-50 border border-brand-200 text-brand-800 px-4 py-2 rounded-2xl font-bold flex items-center gap-2">
+                    <div class="relative flex items-center gap-2 bg-brand-50 border border-brand-200 text-brand-800 px-4 py-2 rounded-2xl font-bold">
                         <span id="beans-counter" class="text-xl">0</span> Grains 🫘
+                        <!-- Info tooltip -->
+                        <div class="relative inline-block">
+                            <button id="beans-info-btn" onclick="document.getElementById('beans-tooltip').classList.toggle('hidden')" class="w-5 h-5 rounded-full bg-sage-200 hover:bg-sage-300 text-sage-700 text-xs font-black flex items-center justify-center transition-colors" aria-label="En savoir plus sur les grains">?</button>
+                            <div id="beans-tooltip" class="hidden absolute right-0 top-7 w-64 bg-sage-900 text-white text-xs rounded-2xl p-4 shadow-xl z-20 leading-relaxed">
+                                <p class="font-bold mb-1">🫘 Comment gagner des Grains ?</p>
+                                <ul class="space-y-1 text-sage-200">
+                                    <li>💬 +5 grains — question au Barista IA</li>
+                                    <li>🗺️ +2 grains — exploration de la carte</li>
+                                    <li>🏛️ +2 grains — visite de la Grande Salle</li>
+                                    <li>✅ +3 grains — tâche cochée dans le carnet</li>
+                                </ul>
+                                <p class="mt-2 text-sage-300 text-[11px]">Les statuts Habitué, Torréfacteur et Grand Cru débloquent des avantages exclusifs.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

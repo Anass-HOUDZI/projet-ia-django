@@ -52,9 +52,30 @@
     </script>
     {% block extra_head %}{% endblock %}
     <style>
-        body {
-            background-color: #FBF4EA;
-            color: #1E1B16;
+        /* Topnav desktop */
+        .topnav-link {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .topnav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 60%;
+            height: 2px;
+            background: #E8622C;
+            border-radius: 2px;
+            transition: transform 0.2s ease;
+        }
+        .topnav-link:hover::after,
+        .topnav-link.active::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+        .topnav-link.active {
+            color: #E8622C;
+            font-weight: 700;
         }
         .glass {
             background: rgba(251, 244, 234, 0.85);
@@ -90,122 +111,70 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased overflow-hidden">
-    
-    <!-- Mobile Header -->
-    <header class="md:hidden bg-coffee-50/90 backdrop-blur-md border-b border-sage-100 p-3 flex items-center justify-between z-40 relative h-[70px]">
-        <a href="/" class="flex items-center gap-2">
-            <!-- Compact Logo -->
-            <div class="flex w-8 h-8 rounded-xl bg-sage-100 items-center justify-center text-sage-700 shadow-sm border border-sage-200">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h13.5a4.5 4.5 0 110 9H6a2 2 0 01-2-2V8z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4v1m4-1v1m4-1v1"></path>
-                </svg>
-            </div>
-            <span class="font-serif font-bold text-lg text-sage-900 tracking-tight leading-none">Café des<br>Nations</span>
-        </a>
+    <!-- Desktop Top Navigation -->
+    <header class="hidden md:flex items-center justify-between px-8 bg-coffee-50/95 backdrop-blur-md border-b border-sage-100 h-16 z-40 relative shadow-[0_1px_12px_-4px_rgba(47,93,80,0.1)] sticky top-0">
         
-        <div class="flex items-center gap-2">
-            <!-- Language Selector (Mobile) -->
-            <select onchange="changeLanguage(this.value)" class="bg-white border border-sage-200 text-sage-700 text-xs rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-1.5 shadow-sm">
-                <option value="fr">FR</option>
-                <option value="en">EN</option>
-                <option value="ar">AR</option>
-                <option value="es">ES</option>
-                <option value="pt">PT</option>
-                <option value="ru">RU</option>
-                <option value="zh">ZH</option>
-                <option value="uk">UK</option>
-            </select>
-            <!-- Emergency Mode Mobile -->
-            <button onclick="openUrgencyPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-red-600 text-white border border-red-700 shadow-sm animate-pulse hover:bg-red-700 transition-colors" title="Besoin d'aide immédiate ? Contacts d'associations et numéros d'urgence">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            </button>
-        </div>
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-2.5 shrink-0 group">
+            <div class="w-8 h-8 rounded-xl bg-sage-700 flex items-center justify-center shadow-sm">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h13.5a4.5 4.5 0 110 9H6a2 2 0 01-2-2V8z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4v1m4-1v1m4-1v1"></path></svg>
+            </div>
+            <span class="font-serif font-bold text-sage-900 text-lg leading-none tracking-tight">Café des Nations</span>
+        </a>
+
+        <!-- Nav Links -->
+        <nav class="flex items-center gap-1">
+            <a href="/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if request.path == '/' %}active{% endif %}">
+                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Accueil
+            </a>
+            <a href="/ai/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/ai/' in request.path %}active{% endif %}">
+                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Le Barista IA
+            </a>
+            <a href="/map/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/map/' in request.path %}active{% endif %}">
+                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Carte
+            </a>
+            <a href="/community/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/community/' in request.path %}active{% endif %}">
+                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Grande Salle
+            </a>
+            <a href="/carnet/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/carnet/' in request.path %}active{% endif %}">
+                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                Mon Carnet
+            </a>
+        </nav>
+
+        <!-- Right: Urgency Button -->
+        <button onclick="openUrgencyPanel()" class="shrink-0 flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-2 rounded-xl border border-red-700 shadow-sm animate-pulse transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            Urgence
+        </button>
     </header>
 
-    <div class="flex h-screen">
-        <!-- Desktop Sidebar -->
-        <aside class="hidden md:flex flex-col w-72 bg-coffee-50 border-r border-sage-100 h-full z-40 relative">
-            
-            <!-- Logo & Brand -->
-            <div class="p-6 pb-4 border-b border-sage-100/50 flex flex-col items-center justify-center text-center">
-                <a href="/" class="group flex flex-col items-center gap-2">
-                    <!-- Logo Image removed as requested, using fallback only -->
-                    <!-- Fallback SVG/Text if image not found -->
-                    <div class="flex flex-col items-center justify-center">
-                        <svg class="w-12 h-12 text-sage-700 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            <!-- We use a coffee cup path here instead for the fallback -->
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 8h13.5a4.5 4.5 0 110 9H6a2 2 0 01-2-2V8z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 4v1m4-1v1m4-1v1"></path>
-                        </svg>
-                        <h1 class="text-2xl font-serif text-sage-900 tracking-tight leading-tight uppercase font-medium">Le café des<br><span class="text-3xl font-bold tracking-widest text-sage-700">Nations</span></h1>
-                    </div>
-                </a>
-            </div>
-            
-            <!-- Language & Emergency -->
-            <div class="px-6 py-4 flex flex-col gap-3 relative border-b border-sage-100/50">
-                <select onchange="changeLanguage(this.value)" id="desktop-lang-select" class="w-full bg-white border border-sage-200 text-sage-700 text-sm rounded-xl focus:ring-brand-500 focus:border-brand-500 block p-2 shadow-sm">
-                    <option value="fr">🇫🇷 Français</option>
-                    <option value="en">🇬🇧 English</option>
-                    <option value="ar">🇸🇦 العربية</option>
-                    <option value="es">🇪🇸 Español</option>
-                    <option value="pt">🇵🇹 Português</option>
-                    <option value="ru">🇷🇺 Русский</option>
-                    <option value="zh">🇨🇳 中文</option>
-                    <option value="uk">🇺🇦 Українська</option>
-                </select>
-                
-                <button onclick="openUrgencyPanel()" class="flex-none flex items-center justify-center w-full h-10 bg-red-600 text-white border border-red-700 rounded-xl hover:bg-red-700 transition-colors shadow-sm animate-pulse">
-                    🚨 Mode Urgence
-                </button>
-            </div>
+    <!-- Unified Main Content (desktop: below topnav | mobile: between header & bottom-nav) -->
+    <div class="flex flex-col" style="height: calc(100vh - 64px);">
 
-            <!-- Navigation -->
-            <nav class="flex-1 px-4 pb-4 space-y-1.5 overflow-y-auto">
-                <p class="px-4 text-xs font-semibold text-sage-500 uppercase tracking-wider mb-2 mt-2">Au Menu</p>
-                
-                <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl nav-item {% if request.path == '/' %}active{% else %}text-coffee-800{% endif %}">
-                    <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                    <span class="font-medium text-sm">L'Accueil</span>
-                </a>
-                
-                <a href="/ai/" class="flex items-center justify-between px-4 py-3 rounded-xl nav-item {% if '/ai/' in request.path %}active{% else %}text-coffee-800{% endif %}">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <span class="font-medium text-sm">Le Barista IA</span>
-                    </div>
-                </a>
-                
-                <a href="/map/" class="flex items-center gap-3 px-4 py-3 rounded-xl nav-item {% if '/map/' in request.path %}active{% else %}text-coffee-800{% endif %}">
-                    <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span class="font-medium text-sm">Trouver mon guichet</span>
-                </a>
-                
-                <a href="/community/" class="flex items-center justify-between px-4 py-3 rounded-xl nav-item {% if '/community/' in request.path %}active{% else %}text-coffee-800{% endif %}">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        <span class="font-medium text-sm">La Grande Salle</span>
-                    </div>
-                </a>
+        <!-- Mobile Header (only shown on mobile, inside the flow) -->
+        <header class="md:hidden bg-coffee-50/90 backdrop-blur-md border-b border-sage-100 px-4 flex items-center justify-between z-40 shrink-0 h-[70px]">
+            <a href="/" class="flex items-center gap-2">
+                <div class="flex w-8 h-8 rounded-xl bg-sage-700 items-center justify-center text-white shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h13.5a4.5 4.5 0 110 9H6a2 2 0 01-2-2V8z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4v1m4-1v1m4-1v1"></path></svg>
+                </div>
+                <span class="font-serif font-bold text-lg text-sage-900 tracking-tight leading-none">Café des<br>Nations</span>
+            </a>
+            <button onclick="openUrgencyPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-red-600 text-white border border-red-700 shadow-sm animate-pulse hover:bg-red-700 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </button>
+        </header>
 
-                <!-- New Feature: Mon Carnet -->
-                <a href="/carnet/" class="flex items-center justify-between px-4 py-3 rounded-xl nav-item {% if '/carnet/' in request.path %}active{% else %}text-coffee-800{% endif %}">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                        <span class="font-medium text-sm">Mon Carnet</span>
-                    </div>
-                </a>
-            </nav>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col relative overflow-hidden bg-transparent mobile-main">
+        <!-- Single content block for ALL pages -->
+        <main class="flex-1 flex flex-col relative overflow-hidden bg-transparent md:pb-0 pb-[60px]">
             {% block content %}{% endblock %}
         </main>
-    </div>
+
+    </div><!-- /unified layout -->
 
     <!-- Mobile Bottom Navigation -->
     <nav class="md:hidden glass fixed bottom-0 left-0 right-0 z-50 px-2 h-[60px] pb-safe shadow-[0_-4px_20px_-10px_rgba(47,93,80,0.15)]">
@@ -245,37 +214,9 @@
     
     {% block extra_scripts %}{% endblock %}
     
-    <!-- Client-side Translation & RTL Script -->
     <script>
-        function changeLanguage(langCode) {
-            localStorage.setItem('preferred_language', langCode);
-            
-            // Sync all selectors
-            document.querySelectorAll('select').forEach(sel => {
-                if (sel.querySelector(`option[value="${langCode}"]`)) {
-                    sel.value = langCode;
-                }
-            });
-            
-            // RTL Logic for Arabic
-            if (langCode === 'ar') {
-                document.documentElement.setAttribute('dir', 'rtl');
-                document.documentElement.lang = 'ar';
-                // Adjust specific flex/margin directions that might not use logical properties
-                document.querySelectorAll('.flex-row').forEach(el => el.classList.add('flex-row-reverse'));
-                // Just a mock for demonstration
-            } else {
-                document.documentElement.setAttribute('dir', 'ltr');
-                document.documentElement.lang = langCode;
-                document.querySelectorAll('.flex-row-reverse').forEach(el => el.classList.remove('flex-row-reverse'));
-            }
-        }
-        
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
-            const savedLang = localStorage.getItem('preferred_language') || 'fr';
-            changeLanguage(savedLang);
-            
             // Onboarding Logic
             const profile = localStorage.getItem('cn_profile');
             if (!profile) {
