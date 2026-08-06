@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Accueil - Café des Nations{% endblock %}
+{% block title %}Café des Nations | Entraide, ANEF, OFII, Visale & Titres de Séjour{% endblock %}
+{% block meta_description %}Plateforme citoyenne et gratuite d'orientation et d'entraide administrative pour étrangers en France. Guides étape par étape ANEF, OFII, Visale, titres de séjour, carte Vie Privée et Familiale et Barista IA.{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -9,21 +10,84 @@
         transform: translateY(-4px);
         box-shadow: 0 12px 24px -10px rgba(47, 93, 80, 0.15);
     }
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out, padding 0.3s ease;
+    }
+    .faq-answer.open {
+        max-height: 500px;
+    }
 </style>
+
+<!-- JSON-LD Structured Data for Google SEO (FAQPage & WebSite Schema) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://cafedesnations.fr/#website",
+      "url": "https://cafedesnations.fr/",
+      "name": "Café des Nations",
+      "description": "Plateforme d'entraide et d'orientation administrative pour les étrangers en France",
+      "inLanguage": "fr-FR"
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://cafedesnations.fr/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Quand dois-je commencer mon dossier de renouvellement de titre de séjour sur l'ANEF ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Il est recommandé d'initier sa demande sur le portail ANEF entre 2 et 3 mois (J-90 à J-60) avant la date d'expiration figurant sur votre carte actuelle."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelles sont les démarches obligatoires auprès de l'OFII lors du premier séjour ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Vous devez valider votre VLS-TS sur l'ANEF dans les 3 mois suivant l'arrivée, puis réaliser la visite médicale et signer le Contrat d'Intégration Républicaine (CIR)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment obtenir un garant gratuitement avec la Garantie Visale ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La Garantie Visale d'Action Logement est une caution gratuite accordée par l'État couvrant le paiement des loyers pour les étudiants et jeunes de moins de 30 ans."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Puis-je travailler en France avec un statut étudiant ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, le titre de séjour étudiant autorise une activité professionnelle accessoire dans la limite de 60% de la durée annuelle du travail (964h par an)."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 {% endblock %}
 
 {% block content %}
-<div class="flex-1 overflow-y-auto pb-24 md:pb-0 relative">
+<div class="flex-1 overflow-y-auto bg-coffee-50/50 pb-24 md:pb-12 relative">
     
     <!-- Hero Section -->
-    <div class="relative overflow-hidden bg-coffee-50 border-b border-sage-100">
+    <header class="relative overflow-hidden bg-coffee-50 border-b border-sage-100">
         <!-- Decorative blobs -->
         <div class="absolute top-0 -left-10 w-96 h-96 bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
         <div class="absolute top-20 -right-10 w-80 h-80 bg-sage-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
 
-        <div class="max-w-4xl mx-auto px-6 pt-16 pb-20 md:pt-24 relative z-10 text-center">
+        <div class="max-w-4xl mx-auto px-6 pt-14 pb-16 md:pt-20 relative z-10 text-center">
             
-            <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white border border-sage-200 text-sage-700 text-sm font-medium mb-8 shadow-sm">
+            <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white border border-sage-200 text-sage-700 text-sm font-medium mb-6 shadow-sm">
                 <span class="flex h-2 w-2 relative">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-600"></span>
@@ -36,57 +100,454 @@
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-500 italic">réussir votre vie en France</span>
             </h1>
             
-            <p class="text-lg md:text-xl text-coffee-800 mb-10 max-w-2xl mx-auto leading-relaxed">
-                Démarches, logement, travail : on vous sert les bonnes réponses, sans la queue à la préfecture. Posez-vous, prenez un café.
+            <p class="text-lg md:text-xl text-coffee-800 mb-8 max-w-2xl mx-auto leading-relaxed">
+                Démarches préfecture (ANEF), contrat OFII, logement Visale, emploi : retrouvez des guides vérifiés et posez vos questions à notre Barista IA.
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <!-- CTA Primary -->
-                <button onclick="openOnboarding()" class="w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl transition-all shadow-md flex items-center justify-center text-center">
+                <a href="/ai/" onclick="openOnboarding(event)" class="w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl transition-all shadow-md flex items-center justify-center text-center">
                     Commander mon conseil
-                </button>
-                
-                <a href="/map/" class="w-full sm:w-auto px-8 py-4 bg-white border-2 border-sage-200 hover:border-sage-300 hover:bg-sage-50 text-sage-800 font-bold rounded-2xl shadow-sm transition-all text-center">
-                    Trouver mon guichet
+                </a>
+
+                <!-- Discord CTA -->
+                <a href="https://discord.gg/3zdSrS85F" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl transition-all shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 text-center border border-indigo-500/30">
+                    <svg class="w-5 h-5 text-indigo-200" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                    Rejoindre le Discord
                 </a>
             </div>
             
-            <div class="mt-8 flex justify-center items-center gap-6 text-sm text-sage-500 font-medium">
+            <div class="mt-8 flex flex-wrap justify-center items-center gap-6 text-sm text-sage-500 font-medium">
                 <div class="flex items-center gap-1.5"><svg class="w-4 h-4 text-brand-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> 100% Gratuit</div>
                 <div class="flex items-center gap-1.5"><svg class="w-4 h-4 text-brand-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Anonyme</div>
-                <div class="flex items-center gap-1.5"><svg class="w-4 h-4 text-brand-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Réponse instantanée</div>
+                <div class="flex items-center gap-1.5"><svg class="w-4 h-4 text-brand-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Sources Gouvernementales (2026)</div>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Features Section -->
-    <div class="max-w-6xl mx-auto px-6 py-16 bg-white rounded-t-3xl -mt-6 relative z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] border-t border-sage-100">
+    <!-- Main Features Section -->
+    <section class="max-w-6xl mx-auto px-6 py-12 bg-white rounded-3xl -mt-6 relative z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] border border-sage-100">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Feature 1 -->
-            <div class="bg-coffee-50 p-8 rounded-3xl border border-sage-100 card-hover transition-all">
+            <article class="bg-coffee-50 p-8 rounded-3xl border border-sage-100 card-hover transition-all">
                 <div class="w-14 h-14 bg-brand-100 text-brand-600 rounded-2xl flex items-center justify-center mb-6 text-2xl shadow-sm">👨‍🍳</div>
                 <h3 class="text-xl font-bold font-serif text-sage-900 mb-3">Le Barista Administratif</h3>
                 <p class="text-coffee-800 text-sm leading-relaxed mb-4">Notre IA connaît le droit des étrangers sur le bout des doigts. Elle vous sert des recommandations claires et sur mesure, avec le sourire.</p>
                 <a href="/ai/" class="text-brand-600 font-semibold text-sm hover:text-brand-700 flex items-center gap-1">Prendre commande <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-            </div>
-            
+            </article>
+
             <!-- Feature 2 -->
-            <div class="bg-coffee-50 p-8 rounded-3xl border border-sage-100 card-hover transition-all">
+            <article class="bg-coffee-50 p-8 rounded-3xl border border-sage-100 card-hover transition-all">
                 <div class="w-14 h-14 bg-sage-200 text-sage-700 rounded-2xl flex items-center justify-center mb-6 text-2xl shadow-sm">📍</div>
                 <h3 class="text-xl font-bold font-serif text-sage-900 mb-3">Le Plan du Quartier</h3>
                 <p class="text-coffee-800 text-sm leading-relaxed mb-4">Ne perdez plus votre temps dans les files d'attente. Localisez les préfectures et CAF avec des estimations d'attente en temps réel.</p>
                 <a href="/map/" class="text-sage-700 font-semibold text-sm hover:text-sage-900 flex items-center gap-1">Explorer la carte <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
-            </div>
+            </article>
             
             <!-- Feature 3 -->
-            <div class="bg-coffee-50 p-8 rounded-3xl border border-sage-100 card-hover transition-all">
+            <article class="bg-coffee-50 p-8 rounded-3xl border border-sage-100 card-hover transition-all">
                 <div class="w-14 h-14 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center mb-6 text-2xl shadow-sm">🛋️</div>
                 <h3 class="text-xl font-bold font-serif text-sage-900 mb-3">La Grande Salle</h3>
                 <p class="text-coffee-800 text-sm leading-relaxed mb-4">Rejoignez 400+ habitués. Asseyez-vous au Comptoir pour vos questions visas, ou au Coin Logement pour trouver un garant.</p>
                 <a href="/community/" class="text-amber-700 font-semibold text-sm hover:text-amber-800 flex items-center gap-1">Ouvrir la porte <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>
+            </article>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         PROMINENT DISCORD COMMUNITY BANNER
+    ====================================================== -->
+    <section class="max-w-6xl mx-auto px-6 pt-10">
+        <div class="bg-gradient-to-r from-indigo-900 via-sage-900 to-indigo-950 text-white rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-indigo-700/40">
+            <!-- Decorative glows -->
+            <div class="absolute -top-24 -left-24 w-72 h-72 bg-indigo-500/30 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-brand-500/20 rounded-full blur-3xl"></div>
+
+            <div class="max-w-xl relative z-10 text-center md:text-left">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-semibold mb-4">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-400 animate-ping"></span>
+                    Communauté active • 450+ habitués en ligne
+                </div>
+                <h2 class="text-3xl md:text-4xl font-serif font-bold text-white mb-3 leading-tight">
+                    Rejoignez le Discord du Café des Nations 💬
+                </h2>
+                <p class="text-indigo-100 text-sm md:text-base leading-relaxed mb-6">
+                    Posez vos questions sur la préfecture, le renouvellement ANEF, le logement Visale ou votre premier emploi, et échangez en direct avec la communauté.
+                </p>
+                <div class="flex flex-wrap gap-2 justify-center md:justify-start text-xs font-medium text-indigo-200">
+                    <span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">📄 Salon Préfecture & ANEF</span>
+                    <span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">🏠 Salon Logement & Visale</span>
+                    <span class="bg-white/10 px-3 py-1 rounded-full border border-white/10">💼 Salon Emploi & Alternance</span>
+                </div>
+            </div>
+
+            <div class="relative z-10 shrink-0 w-full md:w-auto text-center">
+                <a href="https://discord.gg/3zdSrS85F" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl hover:-translate-y-1 text-base w-full md:w-auto">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                    Ouvrir Discord ➔
+                </a>
+                <p class="text-[11px] text-indigo-300 mt-2">Accès 100% libre et instantané</p>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- =====================================================
+         SECTION : GUIDES PRATIQUES ÉTAPE PAR ÉTAPE (SEO)
+    ====================================================== -->
+    <section class="max-w-6xl mx-auto px-6 py-16">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-3 py-1 rounded-full border border-brand-100">Guides Pratiques Étape par Étape</span>
+            <h2 class="text-3xl md:text-4xl font-serif font-bold text-sage-900 mt-3 mb-4">Parcours & Procédure Pas à Pas 📋</h2>
+            <p class="text-coffee-800 text-sm md:text-base leading-relaxed">
+                Suivez nos pas à pas détaillés pour aborder chaque étape de votre installation et de votre renouvellement en toute sérénité.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Guide 1 -->
+            <article class="bg-white p-7 rounded-3xl border border-sage-100 shadow-sm space-y-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-brand-100 text-brand-600 font-bold flex items-center justify-center text-base">01</span>
+                    <div>
+                        <h3 class="font-serif font-bold text-lg text-sage-900">Renouveler son Titre de Séjour sur l'ANEF</h3>
+                        <span class="text-[11px] text-sage-500 font-medium">Délais recommandés : J-90 à J-60</span>
+                    </div>
+                </div>
+                <ol class="space-y-2 text-xs text-coffee-800 border-l-2 border-brand-200 pl-4 py-1">
+                    <li><strong>Étape 1 :</strong> Connectez-vous sur <a href="https://etrangers-en-france.interieur.gouv.fr/" target="_blank" class="text-brand-600 font-bold underline">ANEF</a> avec votre numéro de titre de séjour.</li>
+                    <li><strong>Étape 2 :</strong> Préparez vos justificatifs numérisés (justificatif de domicile de -3 mois, ressources, passeport).</li>
+                    <li><strong>Étape 3 :</strong> Soumettez votre dossier et téléchargez immédiatement votre <em>Attestation de Dépôt</em>.</li>
+                    <li><strong>Étape 4 :</strong> Dès validation préfectorale, obtenez l'<em>Attestation de Prolongation d'Instruction (API)</em>.</li>
+                </ol>
+            </article>
+
+            <!-- Guide 2 -->
+            <article class="bg-white p-7 rounded-3xl border border-sage-100 shadow-sm space-y-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-sage-200 text-sage-800 font-bold flex items-center justify-center text-base">02</span>
+                    <div>
+                        <h3 class="font-serif font-bold text-lg text-sage-900">Le Parcours d'Intégration OFII & Contrat CIR</h3>
+                        <span class="text-[11px] text-sage-500 font-medium">Obligatoire la 1ère année d'installation</span>
+                    </div>
+                </div>
+                <ol class="space-y-2 text-xs text-coffee-800 border-l-2 border-sage-300 pl-4 py-1">
+                    <li><strong>Étape 1 :</strong> Validez votre VLS-TS en ligne sur l'ANEF dans les 90 jours après l'arrivée.</li>
+                    <li><strong>Étape 2 :</strong> Recevez la convocation <a href="https://www.ofii.fr" target="_blank" class="text-sage-700 font-bold underline">OFII</a> pour la visite médicale et le bilan de compétences.</li>
+                    <li><strong>Étape 3 :</strong> Signez le Contrat d'Intégration Républicaine (CIR) et suivez les 4 journées de formation civique.</li>
+                    <li><strong>Étape 4 :</strong> Obtenez l'attestation de réussite CIR nécessaire pour votre renouvellement ou carte pluriannuelle.</li>
+                </ol>
+            </article>
+
+            <!-- Guide 3 -->
+            <article class="bg-white p-7 rounded-3xl border border-sage-100 shadow-sm space-y-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 font-bold flex items-center justify-center text-base">03</span>
+                    <div>
+                        <h3 class="font-serif font-bold text-lg text-sage-900">Obtenir sa Garantie Locative Visale</h3>
+                        <span class="text-[11px] text-sage-500 font-medium">100% gratuit • Étudiants & jeunes < 30 ans</span>
+                    </div>
+                </div>
+                <ol class="space-y-2 text-xs text-coffee-800 border-l-2 border-amber-300 pl-4 py-1">
+                    <li><strong>Étape 1 :</strong> Créez votre compte sur <a href="https://www.visale.fr" target="_blank" class="text-amber-700 font-bold underline">Visale.fr</a> avant de signer votre bail.</li>
+                    <li><strong>Étape 2 :</strong> Téléchargez votre pièce d'identité et justificatif de ressources / scolarité.</li>
+                    <li><strong>Étape 3 :</strong> Obtenez votre <em>Visa de certification Visale</em> sous 48h ouvrées.</li>
+                    <li><strong>Étape 4 :</strong> Transmettez ce certificat à votre propriétaire ou résidence CROUS comme garant.</li>
+                </ol>
+            </article>
+
+            <!-- Guide 4 -->
+            <article class="bg-white p-7 rounded-3xl border border-sage-100 shadow-sm space-y-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-rose-100 text-rose-800 font-bold flex items-center justify-center text-base">04</span>
+                    <div>
+                        <h3 class="font-serif font-bold text-lg text-sage-900">Carte de Séjour Vie Privée et Familiale</h3>
+                        <span class="text-[11px] text-sage-500 font-medium">Fiche pratique officielle Service-Public (F2209)</span>
+                    </div>
+                </div>
+                <ol class="space-y-2 text-xs text-coffee-800 border-l-2 border-rose-300 pl-4 py-1">
+                    <li><strong>Étape 1 :</strong> Vérifiez vos conditions d'éligibilité (mariage avec français, liens personnels forts, PACCS).</li>
+                    <li><strong>Étape 2 :</strong> Consultez la <a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F2209" target="_blank" class="text-rose-700 font-bold underline">Fiche DILA F2209</a> pour l'ensemble des justificatifs.</li>
+                    <li><strong>Étape 3 :</strong> Déposez la demande via l'ANEF ou sur rendez-vous en préfecture selon votre département.</li>
+                    <li><strong>Étape 4 :</strong> Bénéficiez du droit de travailler immédiatement dès délivrance du récépissé/titre.</li>
+                </ol>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- =====================================================
+         SECTION : RESSOURCES OFFICIELLES & ANNUAIRE GOUVERNEMENTAL
+    ====================================================== -->
+    <section id="ressources" class="max-w-6xl mx-auto px-6 py-12">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-3 py-1 rounded-full border border-brand-100">Vérifié & Mis à jour 2026</span>
+            <h2 class="text-3xl md:text-4xl font-serif font-bold text-sage-900 mt-3 mb-4">Portails & Services Publics de Référence 🏛️</h2>
+            <p class="text-coffee-800 text-sm md:text-base leading-relaxed">
+                Accédez directement aux plateformes officielles des ministères, préfectures et établissements publics français pour effectuer vos démarches en toute sécurité.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- Resource 1 -->
+            <div class="bg-white p-6 rounded-2xl border border-sage-100 shadow-sm flex flex-col justify-between hover:border-brand-300 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-sage-700 bg-sage-100 px-2.5 py-1 rounded-lg">Générale / DILA</span>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ Vérifié</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-lg text-sage-900 mb-2">Service-Public.fr</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed mb-4">Fiches pratiques officielles : titres de séjour, renouvellement, droits et devoirs du ressortissant étranger.</p>
+                </div>
+                <a href="https://www.service-public.gouv.fr/particuliers/vosdroits/N110" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 pt-3 border-t border-sage-50">
+                    Consulter les fiches officielles ↗
+                </a>
+            </div>
+
+            <!-- Resource 2 -->
+            <div class="bg-white p-6 rounded-2xl border border-sage-100 shadow-sm flex flex-col justify-between hover:border-brand-300 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-sage-700 bg-sage-100 px-2.5 py-1 rounded-lg">Ministère Intérieur</span>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ Vérifié</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-lg text-sage-900 mb-2">ANEF (Téléservices)</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed mb-4">Administration Numérique pour les Étrangers en France : dépôt en ligne des dossiers (étudiants, passeport talent, etc.).</p>
+                </div>
+                <a href="https://etrangers-en-france.interieur.gouv.fr/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 pt-3 border-t border-sage-50">
+                    Accéder au portail ANEF ↗
+                </a>
+            </div>
+
+            <!-- Resource 3 -->
+            <div class="bg-white p-6 rounded-2xl border border-sage-100 shadow-sm flex flex-col justify-between hover:border-brand-300 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-sage-700 bg-sage-100 px-2.5 py-1 rounded-lg">Établissement Public</span>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ Vérifié</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-lg text-sage-900 mb-2">OFII (Intégration)</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed mb-4">Office Français de l'Immigration et de l'Intégration : validation VLS-TS, Contrat d’Intégration Républicaine (CIR), bilans linguistiques.</p>
+                </div>
+                <a href="https://www.ofii.fr" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 pt-3 border-t border-sage-50">
+                    Site officiel OFII ↗
+                </a>
+            </div>
+
+            <!-- Resource 4 -->
+            <div class="bg-white p-6 rounded-2xl border border-sage-100 shadow-sm flex flex-col justify-between hover:border-brand-300 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-sage-700 bg-sage-100 px-2.5 py-1 rounded-lg">Étudiants / Visas</span>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ Vérifié</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-lg text-sage-900 mb-2">Campus France</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed mb-4">Guichet unique d'accueil des étudiants internationaux : procédures Études en France, bourses, hébergement et checklist arrivée.</p>
+                </div>
+                <a href="https://www.campusfrance.org/fr/venir-en-france" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 pt-3 border-t border-sage-50">
+                    Guide Campus France ↗
+                </a>
+            </div>
+
+            <!-- Resource 5 -->
+            <div class="bg-white p-6 rounded-2xl border border-sage-100 shadow-sm flex flex-col justify-between hover:border-brand-300 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-sage-700 bg-sage-100 px-2.5 py-1 rounded-lg">Enseignement Sup.</span>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ Vérifié</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-lg text-sage-900 mb-2">Welcome to France (Etudiant.gouv)</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed mb-4">Portail multilingue pour les démarches étudiantes : CVEC, sécurité sociale (Ameli), aides CAF et logement CROUS.</p>
+                </div>
+                <a href="https://www.etudiant.gouv.fr/en/welcome-france-2063" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 pt-3 border-t border-sage-50">
+                    Consulter le portail ↗
+                </a>
+            </div>
+
+            <!-- Resource 6 -->
+            <div class="bg-white p-6 rounded-2xl border border-sage-100 shadow-sm flex flex-col justify-between hover:border-brand-300 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-sage-700 bg-sage-100 px-2.5 py-1 rounded-lg">Juridique / Loi</span>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ Vérifié</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-lg text-sage-900 mb-2">Légifrance — CESEDA</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed mb-4">Code de l'Entrée et du Séjour des Étrangers et du Droit d'Asile : la référence légale officielle en France.</p>
+                </div>
+                <a href="https://www.legifrance.gouv.fr" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 pt-3 border-t border-sage-50">
+                    Accéder au CESEDA ↗
+                </a>
+            </div>
+
+            <!-- Resource 7 -->
+            <div class="bg-white p-6 rounded-2xl border border-sage-100 shadow-sm flex flex-col justify-between hover:border-brand-300 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-sage-700 bg-sage-100 px-2.5 py-1 rounded-lg">Asile & Réfugiés</span>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ Vérifié</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-lg text-sage-900 mb-2">OFPRA</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed mb-4">Office Français de Protection des Réfugiés et Apatrides : instruction des demandes d’asile et statut de réfugié.</p>
+                </div>
+                <a href="https://www.ofpra.gouv.fr" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 pt-3 border-t border-sage-50">
+                    Site officiel OFPRA ↗
+                </a>
+            </div>
+
+            <!-- Resource 8 -->
+            <div class="bg-white p-6 rounded-2xl border border-sage-100 shadow-sm flex flex-col justify-between hover:border-brand-300 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-sage-700 bg-sage-100 px-2.5 py-1 rounded-lg">Famille & Mariage</span>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ Vérifié</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-lg text-sage-900 mb-2">Carte Vie Privée et Familiale</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed mb-4">Service-Public DILA : conditions, pièces à fournir et droits attachés à la carte de séjour vie privée et familiale (F2209).</p>
+                </div>
+                <a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F2209" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 pt-3 border-t border-sage-50">
+                    Fiche pratique DILA ↗
+                </a>
+            </div>
+
+            <!-- Resource 9 -->
+            <div class="bg-white p-6 rounded-2xl border border-sage-100 shadow-sm flex flex-col justify-between hover:border-brand-300 transition-colors">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-sage-700 bg-sage-100 px-2.5 py-1 rounded-lg">Préfectures / DINUM</span>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ Vérifié</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-lg text-sage-900 mb-2">Démarches Simplifiées</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed mb-4">Portail national recensant les procédures en ligne complémentaires par préfecture de département.</p>
+                </div>
+                <a href="https://doc.demarches-simplifiees.fr/listes-des-demarches/demarches-relatives-aux-titres-de-sejour-pour-les-etrangers" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 pt-3 border-t border-sage-50">
+                    Liste des démarches ↗
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- =====================================================
+         SECTION : GLOSSAIRE ADMINISTRATIF INTERACTIF
+    ====================================================== -->
+    <section class="bg-white border-y border-sage-100 py-16 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <span class="text-xs font-bold uppercase tracking-wider text-sage-700 bg-sage-100 px-3 py-1 rounded-full">Lexique Officiel</span>
+                <h2 class="text-3xl font-serif font-bold text-sage-900 mt-3 mb-2">Le Glossaire Administratif 📖</h2>
+                <p class="text-coffee-800 text-sm">Les acronymes et termes essentiels expliqués simplement pour ne plus vous perdre dans les démarches.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                
+                <article class="p-5 rounded-2xl bg-coffee-50 border border-sage-100">
+                    <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">ANEF</span>
+                    <h3 class="font-serif font-bold text-base text-sage-900 mt-2 mb-1">Administration Numérique pour les Étrangers en France</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed">Plateforme dématérialisée permettant de demander ou renouveler son titre de séjour sans se déplacer en préfecture.</p>
+                </article>
+
+                <article class="p-5 rounded-2xl bg-coffee-50 border border-sage-100">
+                    <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">CIR</span>
+                    <h3 class="font-serif font-bold text-base text-sage-900 mt-2 mb-1">Contrat d'Intégration Républicaine</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed">Contrat conclu avec l'OFII comprenant les formations civiques obligatoires et le bilan linguistique d'apprentissage du français.</p>
+                </article>
+
+                <article class="p-5 rounded-2xl bg-coffee-50 border border-sage-100">
+                    <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">VLS-TS</span>
+                    <h3 class="font-serif font-bold text-base text-sage-900 mt-2 mb-1">Visa Long Séjour valant Titre de Séjour</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed">Visa délivré pour la 1ère année d'installation. Doit être validé en ligne dans les 3 mois suivant l'arrivée en France.</p>
+                </article>
+
+                <article class="p-5 rounded-2xl bg-coffee-50 border border-sage-100">
+                    <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">API</span>
+                    <h3 class="font-serif font-bold text-base text-sage-900 mt-2 mb-1">Attestation de Prolongation d'Instruction</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed">Document délivré sur l'ANEF pendant l’instruction du dossier de renouvellement, remplaçant l'ancien récépissé papier.</p>
+                </article>
+
+                <article class="p-5 rounded-2xl bg-coffee-50 border border-sage-100">
+                    <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">CESEDA</span>
+                    <h3 class="font-serif font-bold text-base text-sage-900 mt-2 mb-1">Code de l'Entrée et du Séjour des Étrangers</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed">Le recueil des lois et décrets régissant le droit des étrangers, du droit d'asile et de la nationalité en France.</p>
+                </article>
+
+                <article class="p-5 rounded-2xl bg-coffee-50 border border-sage-100">
+                    <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">VISALE</span>
+                    <h3 class="font-serif font-bold text-base text-sage-900 mt-2 mb-1">Garantie Locative Action Logement</h3>
+                    <p class="text-xs text-coffee-800 leading-relaxed">Caution gratuite accordée par l'État pour garantir le paiement des loyers aux propriétaires bailleurs.</p>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         SECTION : FOIRE AUX QUESTIONS (FAQ INTERACTIVE)
+    ====================================================== -->
+    <section class="max-w-4xl mx-auto px-6 py-16">
+        <div class="text-center mb-12">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-3 py-1 rounded-full border border-brand-100">Questions Fréquentes</span>
+            <h2 class="text-3xl font-serif font-bold text-sage-900 mt-3 mb-2">Foire Aux Questions (FAQ) ❓</h2>
+            <p class="text-coffee-800 text-sm">Les réponses vérifiées aux questions les plus posées par les nouveaux arrivants.</p>
+        </div>
+
+        <div class="space-y-4">
+            
+            <!-- FAQ 1 -->
+            <div class="bg-white rounded-2xl border border-sage-100 overflow-hidden shadow-xs">
+                <button onclick="toggleFaq(1)" class="w-full p-5 text-left font-serif font-bold text-base text-sage-900 flex justify-between items-center hover:bg-coffee-50/50 transition-colors">
+                    <span>Quand dois-je commencer mon dossier de renouvellement de titre de séjour ?</span>
+                    <span id="faq-icon-1" class="text-xl text-sage-500 font-normal">+</span>
+                </button>
+                <div id="faq-ans-1" class="faq-answer px-5 text-xs text-coffee-800 leading-relaxed">
+                    <div class="pt-2 pb-5 border-t border-sage-50">
+                        Il est vivement recommandé d'initier sa demande sur le portail <strong>ANEF</strong> entre <strong>2 et 3 mois (J-90 à J-60)</strong> avant la date d'expiration figurant sur votre carte actuelle. Cela évite les ruptures de droits de travail et d'aides sociales (CAF, Sécurité Sociale).
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="bg-white rounded-2xl border border-sage-100 overflow-hidden shadow-xs">
+                <button onclick="toggleFaq(2)" class="w-full p-5 text-left font-serif font-bold text-base text-sage-900 flex justify-between items-center hover:bg-coffee-50/50 transition-colors">
+                    <span>Quelles sont les démarches obligatoires auprès de l'OFII lors de la 1ère année ?</span>
+                    <span id="faq-icon-2" class="text-xl text-sage-500 font-normal">+</span>
+                </button>
+                <div id="faq-ans-2" class="faq-answer px-5 text-xs text-coffee-800 leading-relaxed">
+                    <div class="pt-2 pb-5 border-t border-sage-50">
+                        Si vous détenez un Visa Long Séjour (VLS-TS), vous devez obligatoirement le valider en ligne sur le site de l'ANEF dans les 3 mois suivant votre arrivée et vous acquitter de la taxe de séjour. Vous serez ensuite convoqué(e) à l'OFII pour la visite médicale et la signature du <strong>Contrat d'Intégration Républicaine (CIR)</strong>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="bg-white rounded-2xl border border-sage-100 overflow-hidden shadow-xs">
+                <button onclick="toggleFaq(3)" class="w-full p-5 text-left font-serif font-bold text-base text-sage-900 flex justify-between items-center hover:bg-coffee-50/50 transition-colors">
+                    <span>Comment obtenir un garant pour mon logement si je n'ai pas de famille en France ?</span>
+                    <span id="faq-icon-3" class="text-xl text-sage-500 font-normal">+</span>
+                </button>
+                <div id="faq-ans-3" class="faq-answer px-5 text-xs text-coffee-800 leading-relaxed">
+                    <div class="pt-2 pb-5 border-t border-sage-50">
+                        Vous pouvez demander la <strong>Garantie Visale</strong> (Action Logement), qui est un dispositif d'État 100% gratuit couvrant jusqu'à 36 mois de loyer. Elle est acceptée par de nombreux bailleurs publics et privés.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ 4 -->
+            <div class="bg-white rounded-2xl border border-sage-100 overflow-hidden shadow-xs">
+                <button onclick="toggleFaq(4)" class="w-full p-5 text-left font-serif font-bold text-base text-sage-900 flex justify-between items-center hover:bg-coffee-50/50 transition-colors">
+                    <span>Puis-je travailler en France avec un statut étudiant ?</span>
+                    <span id="faq-icon-4" class="text-xl text-sage-500 font-normal">+</span>
+                </button>
+                <div id="faq-ans-4" class="faq-answer px-5 text-xs text-coffee-800 leading-relaxed">
+                    <div class="pt-2 pb-5 border-t border-sage-50">
+                        Oui ! Le titre de séjour étudiant autorise l'exercice d'une activité professionnelle accessoire dans la limite de <strong>60% de la durée annuelle du travail</strong> (soit 964 heures par an). Aucune autorisation de travail préalable n'est nécessaire.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
 </div>
 
 <!-- Onboarding Modal UI -->
@@ -135,32 +596,52 @@
 </div>
 
 <script>
-    const modal = document.getElementById('onboarding-modal');
-    const content = document.getElementById('onboarding-content');
-    
-    function openOnboarding() {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        // Small timeout to allow display:flex to apply before animating opacity
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-            content.classList.remove('scale-95');
-        }, 10);
+    function openOnboarding(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        const modal = document.getElementById('onboarding-modal');
+        const content = document.getElementById('onboarding-content');
+        if (modal && content) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        } else {
+            window.location.href = '/ai/';
+        }
     }
     
     function closeOnboarding() {
-        modal.classList.add('opacity-0');
-        content.classList.add('scale-95');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }, 300);
+        const modal = document.getElementById('onboarding-modal');
+        const content = document.getElementById('onboarding-content');
+        if (modal && content) {
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
     }
     
     function submitOnboarding() {
-        // Save to localStorage for the chat to pick up (simulated)
         localStorage.setItem('has_onboarded', 'true');
         window.location.href = '/ai/';
+    }
+
+    function toggleFaq(num) {
+        const ans = document.getElementById(`faq-ans-${num}`);
+        const icon = document.getElementById(`faq-icon-${num}`);
+        if(ans) {
+            if(ans.classList.contains('open')) {
+                ans.classList.remove('open');
+                if(icon) icon.innerText = '+';
+            } else {
+                ans.classList.add('open');
+                if(icon) icon.innerText = '−';
+            }
+        }
     }
 </script>
 {% endblock %}

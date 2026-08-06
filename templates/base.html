@@ -4,10 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>{% block title %}Café des Nations{% endblock %}</title>
+    <title>{% block title %}Café des Nations | Entraide & Démarches Étrangers en France{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Café des Nations : Plateforme citoyenne et gratuite d'entraide administrative pour étrangers en France. Guides ANEF, OFII, Visale, renouvellement de titre de séjour, carte de séjour et Barista IA.{% endblock %}">
+    <meta name="keywords" content="titre de sejour, ANEF, OFII, Visale, renouvellement titre de sejour, VLS-TS, CIR, passeport talent, regroupement familial, etudiant etranger, logement france, prefecture police paris">
+    <meta name="author" content="Café des Nations">
+    
+    <!-- OpenGraph SEO -->
+    <meta property="og:title" content="Café des Nations | Entraide & Démarches Étrangers en France">
+    <meta property="og:description" content="Orientation administrative, aide au renouvellement ANEF, logement Visale, contrat CIR OFII et communauté d'entraide.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter SEO -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Café des Nations | Accompagnement Administrations Étrangers">
+    <meta name="twitter:description" content="Orientation administrative et communauté d'entraide pour les étrangers en France.">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%232F5D50'/><path d='M75 35h5a15 15 0 0 1 0 30h-5M15 35h60v35a15 15 0 0 1-15 15H30a15 15 0 0 1-15-15V35zM30 10v10M50 10v10M70 10v10' fill='none' stroke='%23F4A950' stroke-width='8' stroke-linecap='round'/></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%232F5D50'/><text x='50%' y='68%' font-size='55' text-anchor='middle'>🗺️</text></svg>">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -119,8 +133,8 @@
         <div class="max-w-6xl w-full flex items-center justify-between">
             <!-- Logo -->
             <a href="/" class="flex items-center gap-2.5 shrink-0 group">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sage-700 to-sage-900 flex items-center justify-center text-amber-300 shadow-sm border border-sage-600/30 group-hover:scale-105 transition-transform">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"></path></svg>
+                <div class="w-8.5 h-8.5 rounded-xl bg-gradient-to-br from-sage-700 via-sage-800 to-sage-900 flex items-center justify-center text-base shadow-sm border border-sage-600/30 group-hover:scale-105 transition-transform p-1">
+                    🗺️
                 </div>
                 <span class="font-serif font-bold text-sage-900 text-xl leading-none tracking-tight">Café des Nations</span>
             </a>
@@ -157,8 +171,8 @@
         <!-- Mobile Header (only shown on mobile, inside the flow) -->
         <header class="md:hidden bg-coffee-50/90 backdrop-blur-md border-b border-sage-100 px-4 flex items-center justify-center z-40 shrink-0 h-[70px]">
             <a href="/" class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-sage-700 to-sage-900 flex items-center justify-center text-amber-300 shadow-sm border border-sage-600/30">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"></path></svg>
+                <div class="w-7.5 h-7.5 rounded-lg bg-gradient-to-br from-sage-700 to-sage-900 flex items-center justify-center text-sm shadow-sm border border-sage-600/30">
+                    🗺️
                 </div>
                 <span class="font-serif font-bold text-lg text-sage-900 tracking-tight leading-none">Café des Nations</span>
             </a>
@@ -176,7 +190,7 @@
                     <span>Fait avec ❤️ et ☕ pour la communauté</span>
                 </div>
                 <div class="flex items-center gap-4 text-sage-600">
-                    <button onclick="openLegalModal()" class="hover:text-brand-600 transition-colors font-medium underline underline-offset-2">Mentions légales</button>
+                    <a href="/mentions-legales/" class="hover:text-brand-600 transition-colors font-medium underline underline-offset-2">Mentions légales</a>
                     <span>•</span>
                     <span>© 2026 Café des Nations</span>
                 </div>

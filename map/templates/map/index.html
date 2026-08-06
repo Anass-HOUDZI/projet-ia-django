@@ -1,16 +1,24 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Trouver mon guichet - Café des Nations{% endblock %}
+{% block title %}Carte & Annuaire des Guichets en France - Café des Nations{% endblock %}
+{% block meta_description %}Carte interactive et annuaire pédagogique des préfectures, centres OFII, guichets Campus France, OFPRA, CAF et CPAM dans toute la France. Trouvez votre guichet et préparez vos démarches.{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         #map { height: 100%; width: 100%; z-index: 10; }
-        .map-search {
-            box-shadow: 0 4px 20px rgba(47, 93, 80, 0.15);
-        }
         
+        /* Hide scrollbars cleanly */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
         .poi-panel {
             transform: translateX(110%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -26,107 +34,204 @@
             background-color: #E8622C;
             color: white;
             border-color: #E8622C;
+            box-shadow: 0 4px 12px rgba(232, 98, 44, 0.25);
+        }
+
+        .city-pill {
+            transition: all 0.2s ease;
+        }
+        .city-pill:hover {
+            background-color: #2F5D50;
+            color: white;
+        }
+
+        /* Custom Leaflet Marker HTML Badges */
+        .custom-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            border: 2px solid white;
+            transition: transform 0.2s ease;
+        }
+        .custom-marker:hover {
+            transform: scale(1.15);
         }
     </style>
 {% endblock %}
 
 {% block content %}
-    <main class="flex-1 relative overflow-hidden">
-        <div id="map" class="w-full z-10 relative"></div>
+    <main class="flex-1 relative overflow-hidden flex flex-col md:flex-row" style="height: calc(100vh - 64px);">
         
-        <!-- Search Bar -->
-        <div class="absolute top-6 left-1/2 transform -translate-x-1/2 z-[400] w-full max-w-md px-4">
-            <form id="search-form" class="bg-white map-search rounded-2xl flex items-center p-2 border border-sage-100">
-                <div class="text-sage-400 pl-3 pr-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <input type="text" id="search-input" placeholder="Code postal, ville..." class="flex-1 bg-transparent border-0 focus:ring-0 text-sage-900 placeholder-sage-400 font-medium py-2">
-                <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white rounded-xl px-4 py-2 text-sm font-bold transition-colors">
-                    Rechercher
-                </button>
-            </form>
-            
-            <div class="flex items-center justify-between mt-3">
-                <p id="results-counter" class="text-xs font-bold text-sage-700 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm border border-sage-200">
-                    Calcul des guichets...
-                </p>
-                <button id="btn-locate" class="flex items-center gap-2 bg-white text-sage-700 hover:text-brand-600 hover:bg-brand-50 px-3 py-1.5 rounded-lg shadow-sm border border-sage-200 text-xs font-bold transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    Autour de moi
-                </button>
-            </div>
-            
-            <!-- Quick Filters (Chips) -->
-            <div class="flex gap-2 mt-3 overflow-x-auto pb-2 scrollbar-hide" id="filters-container">
-                <button data-type="Préfecture" class="filter-chip shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">Préfectures</button>
-                <button data-type="CAF" class="filter-chip shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">CAF</button>
-                <button data-type="Assurance Maladie" class="filter-chip shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">CPAM</button>
-                <button data-type="CROUS" class="filter-chip shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">CROUS</button>
-            </div>
-        </div>
-        
-        <!-- Detail Panel -->
-        <div id="poi-detail" class="poi-panel absolute top-0 right-0 bottom-0 w-full md:w-96 bg-white z-[500] shadow-2xl border-l border-sage-100 flex flex-col">
-            <div class="p-4 border-b border-sage-100 flex justify-between items-start bg-coffee-50 relative">
+        <!-- Left Side Bar / Directory Panel -->
+        <aside id="directory-panel" class="w-full md:w-96 bg-white border-r border-sage-100 z-20 flex flex-col shrink-0 shadow-sm h-72 md:h-full">
+            <div class="p-4 border-b border-sage-100 bg-coffee-50/80 flex items-center justify-between">
                 <div>
-                    <span class="inline-block px-2.5 py-1 bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider rounded-lg mb-2" id="poi-status">Forte Affluence</span>
-                    <h2 class="font-serif font-bold text-xl text-sage-900 leading-tight" id="poi-name">Nom</h2>
-                    <p class="text-sm text-sage-500 mt-1" id="poi-type">Type</p>
+                    <h2 class="font-serif font-bold text-lg text-sage-900 flex items-center gap-2">
+                        <span>🗺️</span> Annuaire des Guichets
+                    </h2>
+                    <p class="text-xs text-coffee-800">Structures d'État & Établissements Publics</p>
                 </div>
-                <button onclick="closePoiDetail()" class="text-sage-400 hover:text-sage-700 p-2 bg-white rounded-full shadow-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <span id="results-counter" class="text-xs font-bold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">
+                    Chargement...
+                </span>
             </div>
             
-            <div class="flex-1 overflow-y-auto p-5">
-                <div class="bg-white border border-sage-100 rounded-2xl p-4 shadow-sm mb-6 flex items-center justify-between">
+            <!-- List View of POIs -->
+            <div id="poi-list-container" class="flex-1 overflow-y-auto p-3 space-y-2.5">
+                <div class="text-center py-8 text-sage-400 text-xs font-medium">
+                    Chargement des guichets de France...
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Map Area -->
+        <section class="flex-1 relative h-full w-full">
+            <div id="map" class="w-full h-full z-10 relative"></div>
+            
+            <!-- Top Floating Controls Header -->
+            <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-[400] w-full max-w-2xl px-4 space-y-2">
+                
+                <!-- Search Bar -->
+                <form id="search-form" class="bg-white/95 backdrop-blur-md rounded-2xl flex items-center p-2 border border-sage-200 shadow-xl">
+                    <div class="text-sage-400 pl-3 pr-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="text" id="search-input" placeholder="Ville, code postal ou structure (ex: OFII Lyon, Préfecture Lille, Campus France)..." class="flex-1 bg-transparent border-0 focus:ring-0 text-sage-900 placeholder-sage-400 font-medium py-1.5 text-xs md:text-sm">
+                    <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white rounded-xl px-4 py-2 text-xs font-bold transition-colors shadow-sm shrink-0">
+                        Rechercher
+                    </button>
+                </form>
+                
+                <!-- City Jump Pills (Clean No-Scrollbar) -->
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs font-medium">
+                    <span class="text-[11px] font-bold text-sage-700 bg-white/90 backdrop-blur px-2.5 py-1 rounded-lg border border-sage-200 shrink-0">📍 Villes :</span>
+                    <button onclick="zoomCity(48.8566, 2.3522, 'Paris')" class="city-pill shrink-0 bg-white/90 backdrop-blur px-3 py-1 rounded-lg border border-sage-200 text-sage-800 text-xs font-bold shadow-2xs">Paris</button>
+                    <button onclick="zoomCity(50.6292, 3.0573, 'Lille')" class="city-pill shrink-0 bg-white/90 backdrop-blur px-3 py-1 rounded-lg border border-sage-200 text-sage-800 text-xs font-bold shadow-2xs">Lille</button>
+                    <button onclick="zoomCity(45.7640, 4.8357, 'Lyon')" class="city-pill shrink-0 bg-white/90 backdrop-blur px-3 py-1 rounded-lg border border-sage-200 text-sage-800 text-xs font-bold shadow-2xs">Lyon</button>
+                    <button onclick="zoomCity(43.2965, 5.3698, 'Marseille')" class="city-pill shrink-0 bg-white/90 backdrop-blur px-3 py-1 rounded-lg border border-sage-200 text-sage-800 text-xs font-bold shadow-2xs">Marseille</button>
+                    <button onclick="zoomCity(43.6047, 1.4442, 'Toulouse')" class="city-pill shrink-0 bg-white/90 backdrop-blur px-3 py-1 rounded-lg border border-sage-200 text-sage-800 text-xs font-bold shadow-2xs">Toulouse</button>
+                    <button onclick="zoomCity(44.8378, -0.5792, 'Bordeaux')" class="city-pill shrink-0 bg-white/90 backdrop-blur px-3 py-1 rounded-lg border border-sage-200 text-sage-800 text-xs font-bold shadow-2xs">Bordeaux</button>
+                    <button onclick="zoomCity(47.2184, -1.5536, 'Nantes')" class="city-pill shrink-0 bg-white/90 backdrop-blur px-3 py-1 rounded-lg border border-sage-200 text-sage-800 text-xs font-bold shadow-2xs">Nantes</button>
+                    <button onclick="zoomCity(48.5734, 7.7521, 'Strasbourg')" class="city-pill shrink-0 bg-white/90 backdrop-blur px-3 py-1 rounded-lg border border-sage-200 text-sage-800 text-xs font-bold shadow-2xs">Strasbourg</button>
+                </div>
+
+                <!-- Category Filter Chips -->
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" id="filters-container">
+                    <button data-type="Préfecture" class="filter-chip shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300">🏛️ Préfectures ANEF</button>
+                    <button data-type="OFII" class="filter-chip shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300">🤝 OFII (Contrat CIR)</button>
+                    <button data-type="Campus France" class="filter-chip shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300">🎓 Campus France</button>
+                    <button data-type="OFPRA" class="filter-chip shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300">⚖️ OFPRA & Asile</button>
+                    <button data-type="CAF" class="filter-chip shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300">🏠 CAF & Visale</button>
+                    <button data-type="Assurance Maladie" class="filter-chip shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300">🏥 CPAM / Santé</button>
+                </div>
+
+                <!-- Geolocate button -->
+                <div class="flex justify-end">
+                    <button id="btn-locate" class="flex items-center gap-1.5 bg-white/95 backdrop-blur text-sage-800 hover:text-brand-600 hover:bg-brand-50 px-3 py-1.5 rounded-xl shadow-md border border-sage-200 text-xs font-bold transition-colors">
+                        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Autour de moi
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Pedagogical Guide Banner -->
+            <div class="absolute bottom-4 left-4 z-[400] max-w-md bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-sage-200 shadow-xl hidden lg:block">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-xl shrink-0">💡</div>
                     <div>
-                        <p class="text-[11px] font-bold text-sage-500 uppercase tracking-wide">Temps d'attente estimé</p>
-                        <p class="text-3xl font-extrabold text-sage-900 mt-1"><span id="poi-wait">45</span> <span class="text-base text-sage-500 font-medium">min</span></p>
+                        <h4 class="text-xs font-bold text-sage-900 uppercase tracking-wider">Guide Pédagogique des Guichets</h4>
+                        <p class="text-xs text-coffee-800 leading-relaxed mt-1">
+                            • <strong>Préfectures :</strong> Remise de titres de séjour (démarches ANEF en ligne).<br>
+                            • <strong>OFII :</strong> Formations civiques CIR, bilan linguistique et visite médicale.<br>
+                            • <strong>Campus France :</strong> Accueil des étudiants internationaux et visas d'études.<br>
+                            • <strong>OFPRA :</strong> Traitement des demandes d'asile et protection des réfugiés.
+                        </p>
                     </div>
-                    <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+            </div>
+
+            <!-- Detail Sidebar Panel (POI Detail Card) -->
+            <div id="poi-detail" class="poi-panel absolute top-0 right-0 bottom-0 w-full md:w-96 bg-white z-[500] shadow-2xl border-l border-sage-100 flex flex-col">
+                <div class="p-5 border-b border-sage-100 flex justify-between items-start bg-coffee-50 relative">
+                    <div>
+                        <span class="inline-block px-2.5 py-1 bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider rounded-lg mb-2" id="poi-status">Forte Affluence</span>
+                        <h2 class="font-serif font-bold text-xl text-sage-900 leading-tight" id="poi-name">Nom de la structure</h2>
+                        <p class="text-xs font-semibold text-brand-600 mt-1" id="poi-type">Type de structure</p>
                     </div>
+                    <button onclick="closePoiDetail()" class="text-sage-400 hover:text-sage-700 p-2 bg-white rounded-full shadow-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
                 
-                <div class="space-y-4 mb-6">
-                    <div class="flex gap-3 text-sm">
-                        <span class="text-sage-400 mt-0.5"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></span>
-                        <p class="text-sage-800 font-medium" id="poi-address">Adresse complète</p>
-                    </div>
-                    <div class="flex gap-3 text-sm">
-                        <span class="text-sage-400 mt-0.5"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+                <div class="flex-1 overflow-y-auto p-5 space-y-5">
+                    
+                    <!-- Wait Time Card -->
+                    <div class="bg-white border border-sage-100 rounded-2xl p-4 shadow-sm flex items-center justify-between">
                         <div>
-                            <p class="text-sage-800" id="poi-services">Services</p>
+                            <p class="text-[11px] font-bold text-sage-500 uppercase tracking-wide">Estimation Temps d'Attente</p>
+                            <p class="text-3xl font-extrabold text-sage-900 mt-1"><span id="poi-wait">45</span> <span class="text-base text-sage-500 font-medium">min</span></p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 text-xl font-bold">
+                            ⏳
                         </div>
                     </div>
+                    
+                    <!-- Address & Services -->
+                    <div class="space-y-3">
+                        <div class="flex gap-3 text-xs">
+                            <span class="text-sage-400 mt-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></span>
+                            <p class="text-sage-800 font-medium leading-relaxed" id="poi-address">Adresse complète</p>
+                        </div>
+                        <div class="flex gap-3 text-xs">
+                            <span class="text-sage-400 mt-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+                            <div>
+                                <span class="font-bold text-sage-900 block mb-0.5">Missions & Démarches :</span>
+                                <p class="text-coffee-800 leading-relaxed" id="poi-services">Services</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Official Portal Link CTA -->
+                    <div class="bg-coffee-50 p-4 rounded-2xl border border-sage-100 space-y-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-sage-600 block">Portail Officiel Recommandé</span>
+                        <a id="poi-portal-link" href="https://etrangers-en-france.interieur.gouv.fr/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700">
+                            Accéder à la plateforme officielle ↗
+                        </a>
+                    </div>
+
+                    <!-- Documents Checklist -->
+                    <div>
+                        <h3 class="font-serif font-bold text-sage-900 mb-3 text-xs uppercase tracking-wider">Documents à présenter sur place :</h3>
+                        <ul class="space-y-2 text-xs">
+                            <li class="flex items-center gap-2 text-coffee-800 bg-white p-2.5 rounded-xl border border-sage-100 shadow-2xs">
+                                <span class="text-brand-500">📄</span> Convocation ou mail officiel imprimé
+                            </li>
+                            <li class="flex items-center gap-2 text-coffee-800 bg-white p-2.5 rounded-xl border border-sage-100 shadow-2xs">
+                                <span class="text-brand-500">🪪</span> Passeport original + Titre de séjour actuel
+                            </li>
+                            <li class="flex items-center gap-2 text-coffee-800 bg-white p-2.5 rounded-xl border border-sage-100 shadow-2xs">
+                                <span class="text-brand-500">🏠</span> Justificatif de domicile (-3 mois)
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 
-                <h3 class="font-bold text-sage-900 mb-3 text-sm border-t border-sage-100 pt-4">Documents fréquents :</h3>
-                <ul class="space-y-2 mb-6">
-                    <li class="flex items-center gap-2 text-sm text-sage-600 bg-coffee-50 p-2 rounded-lg border border-sage-100">
-                        <span class="text-brand-500">📄</span> Convocation ou mail imprimé
-                    </li>
-                    <li class="flex items-center gap-2 text-sm text-sage-600 bg-coffee-50 p-2 rounded-lg border border-sage-100">
-                        <span class="text-brand-500">🎫</span> Passeport + Titre de séjour actuel
-                    </li>
-                    <li class="flex items-center gap-2 text-sm text-sage-600 bg-coffee-50 p-2 rounded-lg border border-sage-100">
-                        <span class="text-brand-500">🏠</span> Justificatif de domicile (-3 mois)
-                    </li>
-                </ul>
+                <div class="p-4 border-t border-sage-100 bg-white">
+                    <a href="#" id="poi-directions" target="_blank" rel="noopener noreferrer" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                        Y aller (Google Maps)
+                    </a>
+                </div>
             </div>
-            
-            <div class="p-4 border-t border-sage-100 bg-white">
-                <a href="#" id="poi-directions" target="_blank" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-                    Y aller (Google Maps)
-                </a>
-            </div>
-        </div>
+
+        </section>
     </main>
 
     <script>
-        const map = L.map('map', {zoomControl: false}).setView([46.2276, 2.2137], 6); // Centered on France initially
+        // Initialize Leaflet Map
+        const map = L.map('map', {zoomControl: false}).setView([46.2276, 2.2137], 6);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
         
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -138,43 +243,69 @@
         let markersLayer = L.layerGroup().addTo(map);
         let activeFilter = null;
         let activeSearch = '';
+        let isLocating = false;
 
-        // Read profile for default filter
-        const obProfile = JSON.parse(localStorage.getItem('cn_profile'));
-        if (obProfile) {
-            if (obProfile.priorities.includes('sante')) activeFilter = 'Assurance Maladie';
-            else if (obProfile.status === 'etudiant') activeFilter = 'CROUS';
-            else if (obProfile.priorities.includes('titre_sejour')) activeFilter = 'Préfecture';
-            
-            // Set UI chip active
-            if (activeFilter) {
-                setTimeout(() => {
-                    document.querySelectorAll('.filter-chip').forEach(c => {
-                        if(c.dataset.type === activeFilter) c.classList.add('active');
-                    });
-                }, 100);
+        const poiPanel = document.getElementById('poi-detail');
+
+        // Get emoji icon for structure type
+        function getPoiIconEmoji(poiType) {
+            switch(poiType) {
+                case 'Préfecture': return '🏛️';
+                case 'OFII': return '🤝';
+                case 'Campus France': return '🎓';
+                case 'OFPRA': return '⚖️';
+                case 'CAF': return '🏠';
+                case 'Assurance Maladie': return '🏥';
+                case 'CROUS': return '🏢';
+                default: return '📍';
             }
         }
 
-        const poiPanel = document.getElementById('poi-detail');
+        function zoomCity(lat, lng, name) {
+            isLocating = true;
+            map.setView([lat, lng], 12);
+            activeSearch = name.toLowerCase();
+            renderMap();
+        }
 
         function openPoiDetail(poi) {
             document.getElementById('poi-name').innerText = poi.name;
             document.getElementById('poi-type').innerText = poi.poi_type;
             document.getElementById('poi-wait').innerText = poi.wait_time_minutes;
             
-            // Format address
             let fullAddress = poi.address ? poi.address : "Adresse non précisée";
             if(poi.city) fullAddress += `, ${poi.postal_code || ''} ${poi.city}`;
             document.getElementById('poi-address').innerText = fullAddress;
             
             document.getElementById('poi-services').innerText = poi.services_offered || 'Démarches générales';
             
+            // Map official link portal
+            const portalLink = document.getElementById('poi-portal-link');
+            if (poi.poi_type === 'Préfecture') {
+                portalLink.href = 'https://etrangers-en-france.interieur.gouv.fr/';
+                portalLink.innerHTML = 'Accéder à ANEF Préfecture ↗';
+            } else if (poi.poi_type === 'OFII') {
+                portalLink.href = 'https://www.ofii.fr';
+                portalLink.innerHTML = 'Accéder au Portail OFII ↗';
+            } else if (poi.poi_type === 'Campus France') {
+                portalLink.href = 'https://www.campusfrance.org/fr/venir-en-france';
+                portalLink.innerHTML = 'Accéder à Campus France ↗';
+            } else if (poi.poi_type === 'OFPRA') {
+                portalLink.href = 'https://www.ofpra.gouv.fr';
+                portalLink.innerHTML = 'Accéder à OFPRA ↗';
+            } else if (poi.poi_type === 'CAF') {
+                portalLink.href = 'https://www.service-public.gouv.fr/particuliers/vosdroits/N110';
+                portalLink.innerHTML = 'Accéder aux fiches Service-Public ↗';
+            } else {
+                portalLink.href = 'https://www.service-public.gouv.fr/';
+                portalLink.innerHTML = 'Accéder à Service-Public.fr ↗';
+            }
+
             // Directions link
             const query = encodeURIComponent(fullAddress);
             document.getElementById('poi-directions').href = `https://www.google.com/maps/dir/?api=1&destination=${query}`;
             
-            // Colors based on wait time
+            // Status badge color
             const statusEl = document.getElementById('poi-status');
             if (poi.wait_time_minutes > 60) {
                 statusEl.innerText = "Forte affluence";
@@ -188,7 +319,6 @@
             }
             
             poiPanel.classList.add('open');
-            
         }
         
         function closePoiDetail() {
@@ -199,13 +329,21 @@
             markersLayer.clearLayers();
             closePoiDetail();
             
+            const listContainer = document.getElementById('poi-list-container');
+            listContainer.innerHTML = '';
+
             let bounds = [];
             let visibleCount = 0;
             
             allPois.forEach(poi => {
-                // Apply filters
+                const lat = parseFloat(poi.latitude);
+                const lng = parseFloat(poi.longitude);
+                if (isNaN(lat) || isNaN(lng)) return;
+
+                // Filter type
                 if (activeFilter && poi.poi_type !== activeFilter) return;
                 
+                // Search term
                 if (activeSearch) {
                     const term = activeSearch.toLowerCase();
                     const matchCity = poi.city && poi.city.toLowerCase().includes(term);
@@ -215,35 +353,50 @@
                 }
                 
                 visibleCount++;
-                let color = poi.wait_time_minutes > 60 ? '#E8622C' : (poi.wait_time_minutes > 30 ? '#F4A950' : '#2F5D50');
-                
-                const marker = L.circleMarker([poi.latitude, poi.longitude], {
-                    radius: 8,
-                    fillColor: color,
-                    color: '#fff',
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.9
+                const emoji = getPoiIconEmoji(poi.poi_type);
+                const bgColor = poi.wait_time_minutes > 60 ? '#E8622C' : (poi.wait_time_minutes > 30 ? '#F4A950' : '#2F5D50');
+
+                // Leaflet Custom HTML Icon Marker
+                const customIcon = L.divIcon({
+                    className: 'custom-marker-wrapper',
+                    html: `<div class="custom-marker" style="background-color: ${bgColor}; width: 36px; height: 36px; font-size: 18px;">${emoji}</div>`,
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18]
                 });
                 
+                const marker = L.marker([lat, lng], { icon: customIcon });
                 marker.on('click', () => openPoiDetail(poi));
                 markersLayer.addLayer(marker);
                 
-                bounds.push([poi.latitude, poi.longitude]);
+                bounds.push([lat, lng]);
+
+                // Render left side directory item
+                const item = document.createElement('div');
+                item.className = "p-3 rounded-2xl border border-sage-100 hover:border-brand-300 bg-coffee-50/50 hover:bg-white transition-all cursor-pointer shadow-2xs";
+                item.onclick = () => {
+                    map.setView([lat, lng], 14);
+                    openPoiDetail(poi);
+                };
+                item.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sage-100 text-sage-800">${emoji} ${poi.poi_type}</span>
+                        <span class="text-[10px] font-bold ${poi.wait_time_minutes > 60 ? 'text-red-600' : 'text-sage-600'}">~${poi.wait_time_minutes} min</span>
+                    </div>
+                    <h4 class="font-serif font-bold text-xs text-sage-900 mt-1.5">${poi.name}</h4>
+                    <p class="text-[11px] text-sage-600">${poi.city || ''} (${poi.postal_code || ''})</p>
+                `;
+                listContainer.appendChild(item);
             });
             
-            document.getElementById('results-counter').innerText = visibleCount + (visibleCount > 1 ? " guichets trouvés" : " guichet trouvé");
+            document.getElementById('results-counter').innerText = visibleCount + (visibleCount > 1 ? " guichets" : " guichet");
             
-            // Auto zoom to fit markers
             if (bounds.length > 0 && !isLocating) {
-                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+                map.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 });
             } else if (!isLocating) {
-                // Default view if no results
                 map.setView([46.2276, 2.2137], 6);
             }
         }
 
-        let isLocating = false;
         function locateUser() {
             if ("geolocation" in navigator) {
                 isLocating = true;
@@ -252,10 +405,9 @@
                     const lng = position.coords.longitude;
                     map.setView([lat, lng], 13);
                     
-                    // Add a dot for the user
                     L.circleMarker([lat, lng], {
-                        radius: 6,
-                        fillColor: '#3B82F6', // Blue for user
+                        radius: 8,
+                        fillColor: '#3B82F6',
                         color: '#fff',
                         weight: 2,
                         opacity: 1,
@@ -264,7 +416,7 @@
                     
                     isLocating = false;
                 }, (error) => {
-                    console.log("Géolocalisation refusée ou indisponible", error);
+                    console.log("Géolocalisation indisponible", error);
                     isLocating = false;
                 });
             }
@@ -272,33 +424,29 @@
 
         document.getElementById('btn-locate').addEventListener('click', locateUser);
 
-        // Fetch POIs
+        // Fetch POIs from API
         fetch('/map/api/pois/')
             .then(res => res.json())
             .then(data => {
-                if(data.status === 'success') {
+                if(data.status === 'success' && data.pois) {
                     allPois = data.pois;
                     renderMap();
-                    // Ask for location on first load
-                    locateUser();
                 }
             })
             .catch(err => console.error(err));
             
-        // Handle Search
+        // Search Form Submit Listener
         document.getElementById('search-form').addEventListener('submit', (e) => {
             e.preventDefault();
             activeSearch = document.getElementById('search-input').value.trim();
-            isLocating = false; // reset location lock so it zooms to search bounds
+            isLocating = false;
             renderMap();
         });
         
-        // Handle Chips Filter
+        // Filter Chips Listener
         document.querySelectorAll('.filter-chip').forEach(chip => {
             chip.addEventListener('click', (e) => {
                 const type = e.target.dataset.type;
-                
-                // Toggle logic
                 if (activeFilter === type) {
                     activeFilter = null;
                     e.target.classList.remove('active');
@@ -307,8 +455,7 @@
                     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
                     e.target.classList.add('active');
                 }
-                
-                isLocating = false; // reset
+                isLocating = false;
                 renderMap();
             });
         });

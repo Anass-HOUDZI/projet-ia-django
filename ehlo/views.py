@@ -14,3 +14,6 @@ def carnet(request):
         conversations = []
     
     return render(request, 'carnet.html', {'conversations': conversations})
+
+def mentions_legales(request):
+    return render(request, 'mentions_legales.html')
