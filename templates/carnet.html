@@ -14,7 +14,61 @@
             border-color: #3E8E5A;
             color: white;
         }
+        
+        /* Gamification Styles */
+        .roadmap-node {
+            position: relative;
+        }
+        .roadmap-node::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            bottom: -24px;
+            left: 11px;
+            width: 2px;
+            background-color: #e5e7eb;
+            z-index: 0;
+        }
+        .roadmap-node:last-child::before {
+            display: none;
+        }
+        .roadmap-node.active::before {
+            background-color: #e8622c;
+        }
+        .node-icon {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Deadlines Timeline */
+        .deadline-item {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        .deadline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #d1d5db;
+        }
+        .deadline-item.urgent::before  { background: #dc2626; }
+        .deadline-item.warning::before { background: #f59e0b; }
+        .deadline-item.normal::before  { background: #2f5d50; }
+        .deadline-item.ok::before      { background: #6b7280; }
+        .notification-badge {
+            animation: pulse-badge 2s infinite;
+        }
+        @keyframes pulse-badge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(220,38,38,0); }
+        }
     </style>
+    <!-- Canvas Confetti for Level-up celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -33,7 +87,129 @@
 
         <div class="flex flex-col gap-6 animate-fade-in-up" style="animation-delay: 0.1s;">
             
-            <div class="space-y-6">
+            <!-- Carte de Fidélité (Gamification) -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 border border-sage-100 shadow-card">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                    <h3 class="font-bold text-xl text-sage-900 flex items-center gap-3">
+                        <span class="text-2xl">☕</span> Votre Carte de Fidélité
+                    </h3>
+                    <div class="bg-brand-50 border border-brand-200 text-brand-800 px-4 py-2 rounded-2xl font-bold flex items-center gap-2">
+                        <span id="beans-counter" class="text-xl">0</span> Grains 🫘
+                    </div>
+                </div>
+
+                <div class="space-y-2 pl-2" id="roadmap-container">
+                    <!-- Client de passage -->
+                    <div class="roadmap-node active flex gap-4 pb-6">
+                        <div class="node-icon w-6 h-6 rounded-full bg-brand-500 border-4 border-white shadow-sm mt-1 shrink-0"></div>
+                        <div>
+                            <h4 class="font-bold text-sage-900">Client de passage (0-20 Grains)</h4>
+                            <p class="text-sm text-sage-600 mt-1">Vous avez accès aux bases du Café.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Habitué -->
+                    <div class="roadmap-node flex gap-4 pb-6 opacity-60" id="tier-habitue">
+                        <div class="node-icon w-6 h-6 rounded-full bg-sage-200 border-4 border-white shadow-sm mt-1 shrink-0" id="icon-habitue"></div>
+                        <div>
+                            <h4 class="font-bold text-sage-900 flex items-center gap-2" id="title-habitue">Habitué (21 Grains) 🔒</h4>
+                            <p class="text-sm text-sage-600 mt-1">Débloque le badge 🏅 en Grande Salle et le salon privé.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Torréfacteur -->
+                    <div class="roadmap-node flex gap-4 pb-6 opacity-60" id="tier-torrefacteur">
+                        <div class="node-icon w-6 h-6 rounded-full bg-sage-200 border-4 border-white shadow-sm mt-1 shrink-0" id="icon-torrefacteur"></div>
+                        <div>
+                            <h4 class="font-bold text-sage-900 flex items-center gap-2" id="title-torrefacteur">Torréfacteur (61 Grains) 🔒</h4>
+                            <p class="text-sm text-sage-600 mt-1">Accès prioritaire au Barista IA et badge de confiance 🛡️.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Maître Barista -->
+                    <div class="roadmap-node flex gap-4 opacity-60" id="tier-maitre">
+                        <div class="node-icon w-6 h-6 rounded-full bg-sage-200 border-4 border-white shadow-sm mt-1 shrink-0" id="icon-maitre"></div>
+                        <div>
+                            <h4 class="font-bold text-sage-900 flex items-center gap-2" id="title-maitre">Maître Barista (150+ Grains) 🔒</h4>
+                            <p class="text-sm text-sage-600 mt-1">Devenez mentor et rejoignez le Mur des Habitués.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ⏰ Mes Échéances -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 border border-sage-100 shadow-card">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-3">
+                    <h3 class="font-bold text-xl text-sage-900 flex items-center gap-3">
+                        <span class="relative">
+                            ⏰
+                            <span id="deadline-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center notification-badge"></span>
+                        </span>
+                        Mes Échéances
+                    </h3>
+                    <button onclick="document.getElementById('add-deadline-panel').classList.toggle('hidden')" class="flex items-center gap-2 bg-coffee-50 hover:bg-coffee-100 text-sage-800 border border-sage-200 px-4 py-2 rounded-xl text-sm font-bold transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Ajouter une date clé
+                    </button>
+                </div>
+
+                <!-- Add Deadline Panel -->
+                <div id="add-deadline-panel" class="hidden bg-coffee-50 rounded-2xl p-4 mb-5 border border-sage-100">
+                    <form id="add-deadline-form" class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-sage-700 mb-1">Type de démarche</label>
+                                <select id="deadline-type" class="w-full bg-white border border-sage-200 text-sage-900 text-sm rounded-xl px-3 py-2 focus:ring-brand-500 focus:border-brand-500">
+                                    <option value="titre_sejour">Titre de séjour</option>
+                                    <option value="visa">Visa</option>
+                                    <option value="carte_vitale">Carte Vitale</option>
+                                    <option value="bail">Bail / Logement</option>
+                                    <option value="autre">Autre</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-sage-700 mb-1">Date d'échéance</label>
+                                <input type="date" id="deadline-date" class="w-full bg-white border border-sage-200 text-sage-900 text-sm rounded-xl px-3 py-2 focus:ring-brand-500 focus:border-brand-500" required>
+                            </div>
+                        </div>
+                        <input type="text" id="deadline-label" placeholder="Note libre (ex: Renouvellement préfecture Paris)" class="w-full bg-white border border-sage-200 text-sage-900 text-sm rounded-xl px-3 py-2 focus:ring-brand-500 focus:border-brand-500">
+                        <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white rounded-xl px-5 py-2 text-sm font-bold transition-colors">Enregistrer cette date</button>
+                    </form>
+                </div>
+
+                <!-- Timeline -->
+                <div id="deadlines-list" class="space-y-4">
+                    <!-- Generated by JS -->
+                </div>
+
+                <div id="deadlines-empty" class="hidden text-center py-8">
+                    <div class="text-3xl mb-3">📅</div>
+                    <p class="text-sm text-sage-500 font-medium">Aucune échéance enregistrée.<br>Ajoutez votre première date clé pour ne plus rien oublier.</p>
+                </div>
+
+                <!-- Notification Opt-in -->
+                <div class="mt-6 pt-5 border-t border-sage-100">
+                    <p class="text-xs font-bold text-sage-700 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        🔒 Rappels proactifs (vos dates restent strictement privées)
+                    </p>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="opt-push" class="rounded text-brand-600" onchange="saveNotifPrefs()">
+                            <span class="text-sm text-sage-700">🔔 Notifications sur cette application</span>
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="opt-email" class="rounded text-brand-600" onchange="saveNotifPrefs()">
+                            <span class="text-sm text-sage-700">📧 Recevoir les rappels par email</span>
+                        </div>
+                        <div id="email-input-wrapper" class="hidden pl-6">
+                            <input type="email" id="notif-email" placeholder="votre@email.com" class="w-full bg-coffee-50 border border-sage-200 text-sage-900 text-sm rounded-xl px-3 py-2 focus:ring-brand-500 focus:border-brand-500 mt-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 <!-- History -->
                 <div class="bg-white rounded-3xl p-6 border border-sage-100 shadow-card">
@@ -97,8 +273,41 @@
                 </div>
                 
             </div>
+            </div> <!-- closes outer grid -->
         </div>
     </main>
+
+    <!-- Celebration Modal -->
+    <div id="level-up-modal" class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-sage-900/60 backdrop-blur-md p-4">
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md border border-sage-100 overflow-hidden text-center p-8 animate-fade-in-up">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-3xl font-serif font-extrabold text-sage-900 mb-2">Félicitations !</h2>
+            <p class="text-coffee-900 text-lg mb-6">Vous êtes désormais un <strong id="level-up-name" class="text-brand-600">Habitué</strong> du Café ! ☕</p>
+            
+            <div class="bg-brand-50 p-4 rounded-2xl border border-brand-100 text-left mb-8">
+                <p class="text-sm font-bold text-brand-800 mb-2">Vous débloquez aujourd'hui :</p>
+                <ul class="text-sm text-brand-700 space-y-2" id="level-up-perks">
+                    <li>🏅 Un badge distinctif dans la Grande Salle</li>
+                    <li>🗣️ L'accès au salon privé sur Discord</li>
+                </ul>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <button onclick="document.getElementById('level-up-modal').classList.add('hidden')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">Continuer</button>
+                <button onclick="alert('Partage simulé sur Discord !')" class="w-full bg-sage-100 hover:bg-sage-200 text-sage-800 font-bold py-3 px-6 rounded-xl transition-colors">Partager en Grande Salle</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- In-app reminder banner (shown if urgent deadline) -->
+    <div id="reminder-banner" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[999] bg-red-600 text-white rounded-2xl shadow-xl px-5 py-3 flex items-center gap-3 max-w-sm">
+        <span class="text-xl">🚨</span>
+        <div>
+            <p class="font-bold text-sm" id="reminder-banner-title">Action Requise</p>
+            <p class="text-xs opacity-90" id="reminder-banner-body">Une échéance est dans 7 jours ou moins.</p>
+        </div>
+        <button onclick="document.getElementById('reminder-banner').classList.add('hidden')" class="ml-auto text-white/70 hover:text-white text-lg leading-none">&times;</button>
+    </div>
 
     <script>
         // Checklist logic using localStorage
@@ -144,6 +353,129 @@
             progressText.innerText = percentage + '%';
         }
 
+        // Gamification Logic
+        let coffeeBeans = parseInt(localStorage.getItem('cn_beans')) || 0;
+        let currentTier = localStorage.getItem('cn_tier') || 'client';
+        
+        function updateRoadmapUI() {
+            document.getElementById('beans-counter').innerText = coffeeBeans;
+            
+            // Logic for unlocking tiers
+            const habitue = coffeeBeans >= 21;
+            const torrefacteur = coffeeBeans >= 61;
+            const maitre = coffeeBeans >= 150;
+            
+            if(habitue) {
+                document.getElementById('tier-habitue').classList.remove('opacity-60');
+                document.getElementById('icon-habitue').className = 'node-icon w-6 h-6 rounded-full bg-brand-500 border-4 border-white shadow-sm mt-1 shrink-0';
+                document.getElementById('title-habitue').innerHTML = 'Habitué (21 Grains) 🎯';
+                document.querySelector('.roadmap-node:nth-child(1)').classList.add('active');
+            }
+            if(torrefacteur) {
+                document.getElementById('tier-torrefacteur').classList.remove('opacity-60');
+                document.getElementById('icon-torrefacteur').className = 'node-icon w-6 h-6 rounded-full bg-brand-500 border-4 border-white shadow-sm mt-1 shrink-0';
+                document.getElementById('title-torrefacteur').innerHTML = 'Torréfacteur (61 Grains) 🎯';
+                document.getElementById('tier-habitue').classList.add('active');
+            }
+            if(maitre) {
+                document.getElementById('tier-maitre').classList.remove('opacity-60');
+                document.getElementById('icon-maitre').className = 'node-icon w-6 h-6 rounded-full bg-brand-500 border-4 border-white shadow-sm mt-1 shrink-0';
+                document.getElementById('title-maitre').innerHTML = 'Maître Barista (150+ Grains) 🎯';
+                document.getElementById('tier-torrefacteur').classList.add('active');
+            }
+        }
+
+        function triggerConfetti() {
+            var duration = 3 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                // Generate coffee-colored confetti
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#4E3629', '#E8622C', '#F4A950']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#4E3629', '#E8622C', '#F4A950']
+                });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        function checkLevelUp() {
+            let newTier = 'client';
+            if (coffeeBeans >= 150) newTier = 'maitre';
+            else if (coffeeBeans >= 61) newTier = 'torrefacteur';
+            else if (coffeeBeans >= 21) newTier = 'habitue';
+            
+            if (newTier !== currentTier) {
+                currentTier = newTier;
+                localStorage.setItem('cn_tier', currentTier);
+                
+                // Show modal and confetti
+                if (currentTier === 'habitue') {
+                    document.getElementById('level-up-name').innerText = 'Habitué';
+                    document.getElementById('level-up-perks').innerHTML = `
+                        <li>🏅 Un badge distinctif dans la Grande Salle</li>
+                        <li>🗣️ L'accès au salon privé "Les Habitués" sur Discord</li>
+                    `;
+                } else if (currentTier === 'torrefacteur') {
+                    document.getElementById('level-up-name').innerText = 'Torréfacteur';
+                    document.getElementById('level-up-perks').innerHTML = `
+                        <li>🛡️ Badge de confiance pour aider publiquement</li>
+                        <li>⚡ "Fast-pass" : Réponses IA plus approfondies</li>
+                    `;
+                } else if (currentTier === 'maitre') {
+                    document.getElementById('level-up-name').innerText = 'Maître Barista';
+                    document.getElementById('level-up-perks').innerHTML = `
+                        <li>🌟 Statut de mentor communautaire</li>
+                        <li>🏆 Profil affiché sur le Mur des Habitués</li>
+                    `;
+                }
+                
+                document.getElementById('level-up-modal').classList.remove('hidden');
+                triggerConfetti();
+                updateRoadmapUI();
+            }
+        }
+
+        function addBeans(amount) {
+            coffeeBeans += amount;
+            localStorage.setItem('cn_beans', coffeeBeans);
+            document.getElementById('beans-counter').innerText = coffeeBeans;
+            
+            // Small UI animation on counter
+            const counter = document.getElementById('beans-counter');
+            counter.classList.add('text-brand-500', 'scale-125');
+            setTimeout(() => {
+                counter.classList.remove('text-brand-500', 'scale-125');
+            }, 300);
+            
+            checkLevelUp();
+        }
+
+        // Hooking toggleTask to give points
+        const _originalToggleTask = toggleTask;
+        toggleTask = function(id) {
+            const task = tasks.find(t => t.id === id);
+            const wasCompleted = task ? task.completed : false;
+            
+            _originalToggleTask(id);
+            
+            // If it just got checked (was false, now true), give points
+            const isCompletedNow = tasks.find(t => t.id === id)?.completed;
+            if (!wasCompleted && isCompletedNow) {
+                addBeans(3); // +3 beans for completing a task!
+            }
+        };
+
         function renderTasks() {
             checklistContainer.innerHTML = '';
             
@@ -186,5 +518,170 @@
 
         // Initial render
         renderTasks();
+        updateRoadmapUI();
+
+        // ==========================================
+        // DEADLINES / REMINDERS LOGIC
+        // ==========================================
+        let deadlines = JSON.parse(localStorage.getItem('cn_deadlines')) || [];
+        const deadlinesList = document.getElementById('deadlines-list');
+        const deadlinesEmpty = document.getElementById('deadlines-empty');
+        const addDeadlineForm = document.getElementById('add-deadline-form');
+        const deadlineBadge = document.getElementById('deadline-badge');
+        const reminderBanner = document.getElementById('reminder-banner');
+
+        const DEADLINE_LABELS = {
+            titre_sejour: 'Titre de séjour',
+            visa: 'Visa',
+            carte_vitale: 'Carte Vitale',
+            bail: 'Bail / Logement',
+            autre: 'Démarche'
+        };
+
+        function getDaysUntil(dateStr) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const target = new Date(dateStr);
+            return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+        }
+
+        function getUrgencyClass(days) {
+            if (days <= 7)  return 'urgent';
+            if (days <= 30) return 'warning';
+            if (days <= 90) return 'normal';
+            return 'ok';
+        }
+
+        function getUrgencyIcon(days) {
+            if (days <= 7)  return '🚨';
+            if (days <= 30) return '⏳';
+            if (days <= 90) return '📝';
+            return '📅';
+        }
+
+        function getReminderCopy(days, label) {
+            if (days <= 0)  return `🔴 Votre échéance <strong>${label}</strong> est aujourd'hui ou dépassée.`;
+            if (days <= 7)  return `🚨 <strong>Action Requise :</strong> ${label} dans <strong>${days} jours</strong>. Consultez nos contacts d'urgence si besoin.`;
+            if (days <= 30) return `⏳ Plus qu'un mois avant <strong>${label}</strong>. Avez-vous réuni toutes vos pièces ?`;
+            if (days <= 60) return `📝 L'échéance <strong>${label}</strong> approche (${days} j). Jetez un œil à votre checklist.`;
+            if (days <= 90) return `☕ ${label} arrive à échéance dans ${days} jours. C'est le bon moment pour commencer le dossier.`;
+            return `📅 ${label} — dans ${days} jours.`;
+        }
+
+        function saveDeadlines() {
+            localStorage.setItem('cn_deadlines', JSON.stringify(deadlines));
+            renderDeadlines();
+        }
+
+        function deleteDeadline(id) {
+            deadlines = deadlines.filter(d => d.id !== id);
+            saveDeadlines();
+        }
+
+        function renderDeadlines() {
+            deadlinesList.innerHTML = '';
+            let urgentCount = 0;
+            let urgentDeadline = null;
+
+            if (deadlines.length === 0) {
+                deadlinesEmpty.classList.remove('hidden');
+                deadlineBadge.classList.add('hidden');
+                return;
+            }
+            deadlinesEmpty.classList.add('hidden');
+
+            // Sort by date ascending
+            const sorted = [...deadlines].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            sorted.forEach(d => {
+                const days = getDaysUntil(d.date);
+                const urgency = getUrgencyClass(days);
+                const icon = getUrgencyIcon(days);
+                const label = DEADLINE_LABELS[d.type] || d.type;
+                const daysLabel = days <= 0 ? '⚠️ Dépassé' : (days === 1 ? 'Demain' : `Dans ${days} jours`);
+                const copy = getReminderCopy(days, d.label || label);
+
+                if (days <= 7 && days >= 0) {
+                    urgentCount++;
+                    urgentDeadline = d;
+                }
+
+                const el = document.createElement('div');
+                el.className = `deadline-item ${urgency} pb-4`;
+                el.innerHTML = `
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-base">${icon}</span>
+                                <span class="font-bold text-sm text-sage-900">${d.label || label}</span>
+                                <span class="text-xs font-medium px-2 py-0.5 rounded-full ${
+                                    urgency === 'urgent'  ? 'bg-red-100 text-red-700' :
+                                    urgency === 'warning' ? 'bg-amber-100 text-amber-700' :
+                                    urgency === 'normal'  ? 'bg-sage-100 text-sage-700' : 'bg-gray-100 text-gray-500'
+                                }">${daysLabel}</span>
+                            </div>
+                            <p class="text-xs text-sage-600 ml-6">${copy}</p>
+                        </div>
+                        <button onclick="deleteDeadline(${d.id})" class="text-sage-300 hover:text-red-400 transition-colors shrink-0 mt-1" title="Supprimer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                `;
+                deadlinesList.appendChild(el);
+            });
+
+            // Badge on icon
+            if (urgentCount > 0) {
+                deadlineBadge.classList.remove('hidden');
+                deadlineBadge.innerText = urgentCount;
+            } else {
+                deadlineBadge.classList.add('hidden');
+            }
+
+            // Show in-app reminder banner for urgent deadlines
+            if (urgentDeadline) {
+                const days = getDaysUntil(urgentDeadline.date);
+                const label = urgentDeadline.label || DEADLINE_LABELS[urgentDeadline.type] || 'Démarche';
+                document.getElementById('reminder-banner-title').innerText = `Échéance critique : ${label}`;
+                document.getElementById('reminder-banner-body').innerText = days <= 0
+                    ? 'Cette date est aujourd'hui ou dépassée.'
+                    : `Dans ${days} jour${days > 1 ? 's' : ''} — consultez le Barista si besoin.`;
+                reminderBanner.classList.remove('hidden');
+                setTimeout(() => reminderBanner.classList.add('hidden'), 8000);
+            }
+        }
+
+        addDeadlineForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const type  = document.getElementById('deadline-type').value;
+            const date  = document.getElementById('deadline-date').value;
+            const label = document.getElementById('deadline-label').value.trim();
+            if (!date) return;
+
+            deadlines.push({ id: Date.now(), type, date, label });
+            saveDeadlines();
+            addDeadlineForm.reset();
+            document.getElementById('add-deadline-panel').classList.add('hidden');
+        });
+
+        // Notification prefs
+        function saveNotifPrefs() {
+            const emailChecked = document.getElementById('opt-email').checked;
+            const pushChecked  = document.getElementById('opt-push').checked;
+            document.getElementById('email-input-wrapper').classList.toggle('hidden', !emailChecked);
+            localStorage.setItem('cn_notif_prefs', JSON.stringify({ email: emailChecked, push: pushChecked }));
+        }
+
+        // Restore notification prefs
+        const savedPrefs = JSON.parse(localStorage.getItem('cn_notif_prefs'));
+        if (savedPrefs) {
+            document.getElementById('opt-email').checked = savedPrefs.email;
+            document.getElementById('opt-push').checked  = savedPrefs.push;
+            if (savedPrefs.email) document.getElementById('email-input-wrapper').classList.remove('hidden');
+        }
+
+        // Initial render deadlines
+        renderDeadlines();
+
     </script>
 {% endblock %}
