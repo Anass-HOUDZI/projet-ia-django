@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Mon Carnet - Café des Nations{% endblock %}
 
@@ -19,42 +20,14 @@
 {% block content %}
     <main class="flex-1 max-w-5xl mx-auto w-full p-4 md:p-8 overflow-y-auto">
         
-        <div class="mb-8 mt-4 md:mt-0 animate-fade-in-up">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-sage-900 mb-2 font-serif">Mon Carnet 📓</h1>
-            <p class="text-coffee-800 text-lg">Votre espace personnel pour suivre vos démarches et votre fidélité au Café.</p>
+        <div class="px-6 py-8">
+            <h1 class="text-3xl font-extrabold text-sage-900 tracking-tight mb-2 font-serif">Mon Carnet 📓</h1>
+            <p class="text-coffee-800 text-sm">Retrouvez ici l'historique de vos échanges avec le Barista.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up" style="animation-delay: 0.1s;">
+        <div class="flex flex-col gap-6 animate-fade-in-up" style="animation-delay: 0.1s;">
             
-            <!-- Gamification Profile -->
-            <div class="col-span-1 bg-white rounded-3xl p-6 border border-sage-100 shadow-card">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-16 h-16 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner">
-                        <span id="profile-beans">0</span>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-sage-500 uppercase tracking-wider mb-1">Votre statut</p>
-                        <h2 class="font-serif font-bold text-xl text-sage-900" id="profile-rank">Client de passage</h2>
-                    </div>
-                </div>
-                
-                <div class="mb-4">
-                    <div class="flex justify-between text-sm mb-2">
-                        <span class="font-medium text-coffee-800">Progression vers le rang suivant</span>
-                    </div>
-                    <div class="w-full bg-sage-100 rounded-full h-3 overflow-hidden">
-                        <div id="profile-progress" class="bg-gradient-to-r from-brand-500 to-brand-600 h-3 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
-                    </div>
-                    <p class="text-xs text-sage-500 mt-2 text-right" id="profile-desc">Encore quelques questions...</p>
-                </div>
-                
-                <div class="bg-coffee-50 rounded-xl p-4 mt-6 border border-sage-100 text-sm text-coffee-800">
-                    <strong class="block mb-1 text-sage-900">💡 Comment gagner des grains ?</strong>
-                    Discutez avec le Barista IA (+5), explorez la carte (+2), visitez la Grande Salle (+2). Bientôt : aidez d'autres membres !
-                </div>
-            </div>
-            
-            <div class="col-span-1 md:col-span-2 space-y-6">
+            <div class="space-y-6">
                 
                 <!-- History -->
                 <div class="bg-white rounded-3xl p-6 border border-sage-100 shadow-card">
@@ -83,10 +56,10 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <div class="text-center py-8 bg-coffee-50 rounded-2xl border border-dashed border-sage-200">
-                            <span class="text-3xl mb-3 block opacity-50">👨‍🍳</span>
-                            <p class="text-sm text-sage-600 mb-4">Vous n'avez pas encore discuté avec le Barista.</p>
-                            <a href="/ai/" class="inline-block bg-white border border-sage-200 text-sage-800 font-medium px-4 py-2 rounded-xl hover:border-sage-300 transition-colors shadow-sm">Poser ma première question</a>
+                        <div class="text-center py-12 bg-white rounded-3xl border border-sage-100 shadow-sm">
+                            <div class="text-4xl mb-4 opacity-50">☕</div>
+                            <p class="text-sage-600 font-medium">Aucun échange pour le moment. Allez poser votre première question !</p>
+                            <a href="/ai/" class="inline-block mt-4 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2 px-6 rounded-xl transition-colors shadow-sm">Aller voir le Barista</a>
                         </div>
                     {% endif %}
                 </div>
@@ -134,38 +107,10 @@
             const item = checkbox.closest('.checklist-item');
             if (checkbox.checked) {
                 item.classList.add('done');
-                // Fake gamification reward for checking a task
-                if (window.addCoffeeBeans) window.addCoffeeBeans(10);
             } else {
                 item.classList.remove('done');
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Populate profile data based on existing gamification logic in base.html
-            setTimeout(() => {
-                const beans = parseInt(localStorage.getItem('cafe_beans') || '0');
-                document.getElementById('profile-beans').innerText = beans + " 🫘";
-                
-                let currentRank = RANKS[0];
-                for(let r of RANKS) {
-                    if (beans >= r.threshold) currentRank = r;
-                }
-                
-                document.getElementById('profile-rank').innerText = currentRank.name;
-                
-                let remPoints = currentRank.max - beans;
-                if (remPoints < 0) remPoints = 0;
-                
-                document.getElementById('profile-desc').innerText = 
-                    currentRank.threshold === 0 ? `Encore ${Math.ceil(remPoints/5)} questions pour évoluer` : `Encore ${remPoints} grains pour évoluer`;
-                
-                let percentage = 100;
-                if (currentRank.max > currentRank.threshold) {
-                    percentage = ((beans - currentRank.threshold) / (currentRank.max - currentRank.threshold)) * 100;
-                }
-                document.getElementById('profile-progress').style.width = percentage + '%';
-            }, 100);
-        });
     </script>
 {% endblock %}

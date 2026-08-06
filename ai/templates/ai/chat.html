@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Le Barista - Café des Nations{% endblock %}
+{% block title %}Le Barista{% endblock %}
 
 {% block extra_head %}
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -59,8 +60,8 @@
             <div class="w-20 h-20 bg-brand-100 rounded-3xl flex items-center justify-center mb-5 rotate-3 shadow-sm border border-brand-200">
                 <span class="text-4xl">👨‍🍳</span>
             </div>
-            <h2 class="text-sage-900 font-serif font-bold text-2xl mb-2">Prenez place, que puis-je vous servir ?</h2>
-            <p class="text-sm text-coffee-800 max-w-md mx-auto mb-8">Posez vos questions sur vos démarches. Je vous sers des réponses claires et sur mesure.</p>
+            <h2 class="text-sage-900 font-serif font-bold text-2xl mb-2">Le Barista</h2>
+            <p class="text-sm text-coffee-800 max-w-md mx-auto mb-8">Posez-moi vos questions sur vos démarches, visas, ou la vie en France. Je suis là pour vous aider.</p>
             
             <div class="flex flex-wrap justify-center gap-2 max-w-xl">
                 <button onclick="document.getElementById('chat-input').value='Renouveler mon titre de séjour étudiant'; chatForm.dispatchEvent(new Event('submit'));" class="chip bg-white border border-sage-200 text-sage-700 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 px-4 py-2 rounded-full text-sm font-medium">
@@ -113,24 +114,14 @@
     <footer class="bg-coffee-50/90 backdrop-blur-md border-t border-sage-100 p-4 sticky bottom-0">
         <div class="max-w-4xl mx-auto relative">
             
-            <!-- Language Indicator (UI Only) -->
-            <div class="absolute -top-8 right-0 text-[10px] font-bold text-sage-500 uppercase tracking-wider bg-white px-2 py-1 rounded-t-lg border border-sage-100 border-b-0">
-                <span class="mr-1">💬</span> Répond dans votre langue
-            </div>
-
             <form id="chat-form" class="flex items-end gap-2 relative bg-white border border-sage-200 rounded-2xl p-2 shadow-sm focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-brand-500 transition-all">
                 <input type="hidden" id="conversation-id" value="{{ conversation.id }}">
                 
-                <!-- Upload button (UI Only) -->
-                <button type="button" class="p-2 text-sage-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors shrink-0" title="Joindre un document (Bientôt)">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                </button>
-
                 <textarea 
                     id="chat-input" 
                     rows="1" 
                     class="w-full bg-transparent border-0 focus:ring-0 resize-none text-coffee-900 py-2.5 px-2 max-h-[150px]"
-                    placeholder="Tapez votre question..."
+                    placeholder="Posez votre question ici..."
                     required
                 ></textarea>
 
@@ -138,7 +129,7 @@
                     <svg class="w-5 h-5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                 </button>
             </form>
-            <p class="text-center text-[11px] text-sage-500 mt-2 font-medium">Notre Barista fait de son mieux, mais pour les infos qui comptent vraiment, on double-check ensemble sur <a href="https://www.service-public.fr" target="_blank" class="underline hover:text-brand-600">service-public.fr</a> 👌</p>
+            <p class="text-center text-[11px] text-sage-500 mt-2 font-medium">Notre Barista fait de son mieux, mais pour les infos qui comptent vraiment, on double-check ensemble sur service-public.fr 👌</p>
         </div>
     </footer>
 
@@ -230,9 +221,6 @@
             typingIndicator.classList.remove('hidden');
             scrollToBottom();
             sendBtn.disabled = true;
-
-            // Gamification : +5 Grains de café
-            if(window.addCoffeeBeans) window.addCoffeeBeans(5);
 
             try {
                 const response = await fetch('/ai/api/send_message/', {
