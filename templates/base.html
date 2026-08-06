@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}Café des Nations{% endblock %}</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%232F5D50'/><path d='M75 35h5a15 15 0 0 1 0 30h-5M15 35h60v35a15 15 0 0 1-15 15H30a15 15 0 0 1-15-15V35zM30 10v10M50 10v10M70 10v10' fill='none' stroke='%23F4A950' stroke-width='8' stroke-linecap='round'/></svg>">
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,67 +115,73 @@
     </style>
 </head>
     <!-- Desktop Top Navigation -->
-    <header class="hidden md:flex items-center justify-between px-8 bg-coffee-50/95 backdrop-blur-md border-b border-sage-100 h-16 z-40 relative shadow-[0_1px_12px_-4px_rgba(47,93,80,0.1)] sticky top-0">
-        
-        <!-- Logo -->
-        <a href="/" class="flex items-center gap-2.5 shrink-0 group">
-            <div class="w-8 h-8 rounded-xl bg-sage-700 flex items-center justify-center shadow-sm">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h13.5a4.5 4.5 0 110 9H6a2 2 0 01-2-2V8z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4v1m4-1v1m4-1v1"></path></svg>
-            </div>
-            <span class="font-serif font-bold text-sage-900 text-lg leading-none tracking-tight">Café des Nations</span>
-        </a>
+    <header class="hidden md:flex items-center justify-center px-8 bg-coffee-50/95 backdrop-blur-md border-b border-sage-100 h-16 z-40 relative shadow-[0_1px_12px_-4px_rgba(47,93,80,0.1)] sticky top-0">
+        <div class="max-w-6xl w-full flex items-center justify-between">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-2.5 shrink-0 group">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sage-700 to-sage-900 flex items-center justify-center text-amber-300 shadow-sm border border-sage-600/30 group-hover:scale-105 transition-transform">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"></path></svg>
+                </div>
+                <span class="font-serif font-bold text-sage-900 text-xl leading-none tracking-tight">Café des Nations</span>
+            </a>
 
-        <!-- Nav Links -->
-        <nav class="flex items-center gap-1">
-            <a href="/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if request.path == '/' %}active{% endif %}">
-                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                Accueil
-            </a>
-            <a href="/ai/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/ai/' in request.path %}active{% endif %}">
-                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Le Barista IA
-            </a>
-            <a href="/map/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/map/' in request.path %}active{% endif %}">
-                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                Carte
-            </a>
-            <a href="/community/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/community/' in request.path %}active{% endif %}">
-                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                Grande Salle
-            </a>
-            <a href="/carnet/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/carnet/' in request.path %}active{% endif %}">
-                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                Mon Carnet
-            </a>
-        </nav>
-
-        <!-- Right: Urgency Button -->
-        <button onclick="openUrgencyPanel()" class="shrink-0 flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-2 rounded-xl border border-red-700 shadow-sm animate-pulse transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            Urgence
-        </button>
+            <!-- Nav Links -->
+            <nav class="flex items-center gap-1">
+                <a href="/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if request.path == '/' %}active{% endif %}">
+                    <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    Accueil
+                </a>
+                <a href="/ai/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/ai/' in request.path %}active{% endif %}">
+                    <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Le Barista IA
+                </a>
+                <a href="/map/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/map/' in request.path %}active{% endif %}">
+                    <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Carte
+                </a>
+                <a href="/community/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/community/' in request.path %}active{% endif %}">
+                    <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Grande Salle
+                </a>
+                <a href="/carnet/" class="topnav-link flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-coffee-800 hover:text-sage-900 hover:bg-sage-100/60 transition-colors {% if '/carnet/' in request.path %}active{% endif %}">
+                    <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    Mon Carnet
+                </a>
+            </nav>
+        </div>
     </header>
 
     <!-- Unified Main Content (desktop: below topnav | mobile: between header & bottom-nav) -->
-    <div class="flex flex-col" style="height: calc(100vh - 64px);">
+    <div class="flex flex-col flex-1 overflow-y-auto" style="height: calc(100vh - 64px);">
 
         <!-- Mobile Header (only shown on mobile, inside the flow) -->
-        <header class="md:hidden bg-coffee-50/90 backdrop-blur-md border-b border-sage-100 px-4 flex items-center justify-between z-40 shrink-0 h-[70px]">
+        <header class="md:hidden bg-coffee-50/90 backdrop-blur-md border-b border-sage-100 px-4 flex items-center justify-center z-40 shrink-0 h-[70px]">
             <a href="/" class="flex items-center gap-2">
-                <div class="flex w-8 h-8 rounded-xl bg-sage-700 items-center justify-center text-white shadow-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h13.5a4.5 4.5 0 110 9H6a2 2 0 01-2-2V8z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4v1m4-1v1m4-1v1"></path></svg>
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-sage-700 to-sage-900 flex items-center justify-center text-amber-300 shadow-sm border border-sage-600/30">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"></path></svg>
                 </div>
-                <span class="font-serif font-bold text-lg text-sage-900 tracking-tight leading-none">Café des<br>Nations</span>
+                <span class="font-serif font-bold text-lg text-sage-900 tracking-tight leading-none">Café des Nations</span>
             </a>
-            <button onclick="openUrgencyPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-red-600 text-white border border-red-700 shadow-sm animate-pulse hover:bg-red-700 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            </button>
         </header>
 
         <!-- Single content block for ALL pages -->
-        <main class="flex-1 flex flex-col relative overflow-hidden bg-transparent md:pb-0 pb-[60px]">
+        <main class="flex-1 flex flex-col relative bg-transparent md:pb-0 pb-[60px]">
             {% block content %}{% endblock %}
         </main>
+
+        <!-- Footer -->
+        <footer class="bg-coffee-50/90 border-t border-sage-100 py-5 px-6 text-center text-xs text-sage-600 shrink-0 mt-auto md:mb-0 mb-[60px]">
+            <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-2 font-medium text-sage-800">
+                    <span>Fait avec ❤️ et ☕ pour la communauté</span>
+                </div>
+                <div class="flex items-center gap-4 text-sage-600">
+                    <button onclick="openLegalModal()" class="hover:text-brand-600 transition-colors font-medium underline underline-offset-2">Mentions légales</button>
+                    <span>•</span>
+                    <span>© 2026 Café des Nations</span>
+                </div>
+            </div>
+        </footer>
 
     </div><!-- /unified layout -->
 
@@ -445,286 +454,5 @@
 
         </div>
     </div>
-    <!-- =====================================================
-         PANNEAU URGENCE
-    ====================================================== -->
-    <div id="urgency-overlay" class="hidden fixed inset-0 z-[1100] bg-sage-900/50 backdrop-blur-sm" onclick="closeUrgencyPanel()"></div>
-
-    <aside id="urgency-panel" class="fixed top-0 right-0 h-full w-full max-w-md z-[1200] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-out flex flex-col overflow-hidden">
-
-        <!-- Sticky Legal Banner -->
-        <div class="bg-red-700 text-white px-4 py-3 flex items-start gap-3 shrink-0">
-            <span class="text-xl mt-0.5">🚨</span>
-            <p class="text-xs leading-relaxed">
-                <strong>En cas de danger immédiat, appelez le 17 (police) ou le 15 (SAMU).</strong><br>
-                Ces informations ne remplacent pas un avis juridique professionnel.
-            </p>
-        </div>
-
-        <!-- Header -->
-        <div class="flex items-center justify-between px-5 py-4 border-b border-sage-100 shrink-0">
-            <h2 class="font-serif font-bold text-xl text-sage-900">On est là. <span class="text-brand-600">De l'aide immédiate.</span></h2>
-            <button onclick="closeUrgencyPanel()" class="w-8 h-8 flex items-center justify-center text-sage-400 hover:text-sage-700 hover:bg-sage-100 rounded-full transition-colors text-xl leading-none">&times;</button>
-        </div>
-
-        <!-- Category Chips -->
-        <div class="px-5 py-4 flex flex-wrap gap-2 border-b border-sage-100 shrink-0">
-            <button onclick="showUrgencyCategory('oqtf')"     id="chip-oqtf"     class="urgency-chip px-3 py-1.5 rounded-full border text-sm font-bold bg-white border-sage-200 text-sage-700 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors">📜 J'ai reçu une OQTF</button>
-            <button onclick="showUrgencyCategory('logement')" id="chip-logement" class="urgency-chip px-3 py-1.5 rounded-full border text-sm font-bold bg-white border-sage-200 text-sage-700 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors">🏠 Plus de logement</button>
-            <button onclick="showUrgencyCategory('violence')" id="chip-violence" class="urgency-chip px-3 py-1.5 rounded-full border text-sm font-bold bg-white border-sage-200 text-sage-700 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors">🚨 Je suis en danger</button>
-            <button onclick="showUrgencyCategory('medical')"  id="chip-medical"  class="urgency-chip px-3 py-1.5 rounded-full border text-sm font-bold bg-white border-sage-200 text-sage-700 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors">🏥 Urgence médicale</button>
-            <button onclick="showUrgencyCategory('admin')"    id="chip-admin"    class="urgency-chip px-3 py-1.5 rounded-full border text-sm font-bold bg-white border-sage-200 text-sage-700 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors">⚖️ Autre démarche</button>
-        </div>
-
-        <!-- Default / No category selected -->
-        <div id="urgency-default" class="flex-1 overflow-y-auto px-5 py-6">
-            <p class="text-sage-600 text-sm mb-5 text-center">☕ Sélectionnez une situation ci-dessus pour voir les contacts adaptés.</p>
-            <div class="grid grid-cols-2 gap-3">
-                <a href="tel:17" class="flex flex-col items-center justify-center bg-red-600 text-white rounded-2xl p-4 shadow-sm hover:bg-red-700 transition-colors">
-                    <span class="text-3xl font-black">17</span>
-                    <span class="text-xs font-bold mt-1">Police / Gendarmerie</span>
-                </a>
-                <a href="tel:15" class="flex flex-col items-center justify-center bg-red-500 text-white rounded-2xl p-4 shadow-sm hover:bg-red-600 transition-colors">
-                    <span class="text-3xl font-black">15</span>
-                    <span class="text-xs font-bold mt-1">SAMU (Urgences méd.)</span>
-                </a>
-                <a href="tel:18" class="flex flex-col items-center justify-center bg-orange-500 text-white rounded-2xl p-4 shadow-sm hover:bg-orange-600 transition-colors">
-                    <span class="text-3xl font-black">18</span>
-                    <span class="text-xs font-bold mt-1">Pompiers</span>
-                </a>
-                <a href="tel:112" class="flex flex-col items-center justify-center bg-amber-500 text-white rounded-2xl p-4 shadow-sm hover:bg-amber-600 transition-colors">
-                    <span class="text-3xl font-black">112</span>
-                    <span class="text-xs font-bold mt-1">Urgence Européenne</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- Category Content -->
-        <div id="urgency-content" class="hidden flex-1 overflow-y-auto px-5 py-4 space-y-4">
-            <!-- Filled dynamically by JS -->
-        </div>
-
-    </aside>
-
-    <script>
-        // ============================================
-        // URGENCY PANEL DATA & LOGIC
-        // ============================================
-        const URGENCY_DATA = {
-            oqtf: {
-                title: "📜 J'ai reçu une OQTF",
-                intro: "Ne restez pas seul(e). Ces associations spécialisées en droit des étrangers peuvent vous accompagner immédiatement.",
-                contacts: [
-                    {
-                        name: "La Cimade",
-                        phone: "01 44 18 60 50",
-                        tel: "0033144186050",
-                        desc: "Soutien juridique aux personnes exilées, réfugiées et immigrées.",
-                        hours: "Lun-Ven 9h-17h",
-                        color: "bg-sage-50 border-sage-200"
-                    },
-                    {
-                        name: "GISTI",
-                        phone: "01 43 14 84 84",
-                        tel: "0033143148484",
-                        desc: "Groupement d'information et de soutien des immigrés. Consultations juridiques.",
-                        hours: "Lun-Ven 14h-17h",
-                        color: "bg-sage-50 border-sage-200"
-                    },
-                    {
-                        name: "France Terre d'Asile",
-                        phone: "01 53 04 39 99",
-                        tel: "0033153043999",
-                        desc: "Accompagnement juridique et soutien à la demande d'asile.",
-                        hours: "Lun-Ven 9h-18h",
-                        color: "bg-sage-50 border-sage-200"
-                    },
-                    {
-                        name: "Aide juridictionnelle (avocat gratuit)",
-                        phone: "",
-                        tel: "",
-                        desc: "Si vos ressources sont modestes, vous pouvez bénéficier d'un avocat payé par l'État.",
-                        hours: "Demande auprès du tribunal judiciaire",
-                        color: "bg-brand-50 border-brand-200"
-                    }
-                ]
-            },
-            logement: {
-                title: "🏠 Je n'ai plus de logement",
-                intro: "Vous n'êtes pas seul(e). Ces structures peuvent vous orienter vers un hébergement d'urgence.",
-                contacts: [
-                    {
-                        name: "115 — SIAO Urgence",
-                        phone: "115",
-                        tel: "115",
-                        desc: "Numéro national d'urgence sociale pour un hébergement. Gratuit, 24h/24.",
-                        hours: "24h/24 — 7j/7",
-                        color: "bg-red-50 border-red-200"
-                    },
-                    {
-                        name: "Croix-Rouge Française",
-                        phone: "01 44 43 11 00",
-                        tel: "0033144431100",
-                        desc: "Aide alimentaire, vestimentaire et hébergement d'urgence.",
-                        hours: "Variable selon section locale",
-                        color: "bg-sage-50 border-sage-200"
-                    },
-                    {
-                        name: "Emmaüs Connect",
-                        phone: "09 70 84 83 82",
-                        tel: "0033970848382",
-                        desc: "Accès aux droits, aux services et aux aides pour les personnes précaires.",
-                        hours: "Lun-Ven 9h-18h",
-                        color: "bg-sage-50 border-sage-200"
-                    }
-                ]
-            },
-            violence: {
-                title: "🚨 Je suis en danger / Violences",
-                intro: "Si vous êtes en danger immédiat, appelez le 17 maintenant. Ces ressources sont également disponibles.",
-                contacts: [
-                    {
-                        name: "17 — Police / Gendarmerie",
-                        phone: "17",
-                        tel: "17",
-                        desc: "Urgence sécurité. Appelez si votre vie ou celle d'autrui est en danger.",
-                        hours: "24h/24 — 7j/7",
-                        color: "bg-red-50 border-red-300"
-                    },
-                    {
-                        name: "3919 — Violences Femmes Info",
-                        phone: "3919",
-                        tel: "3919",
-                        desc: "Numéro national pour les victimes de violences conjugales, sexuelles ou familiales. Gratuit.",
-                        hours: "7j/7 de 9h à 22h",
-                        color: "bg-rose-50 border-rose-200"
-                    },
-                    {
-                        name: "114 — Urgence pour les personnes sourdes/malentendantes",
-                        phone: "114",
-                        tel: "114",
-                        desc: "SMS, appel vidéo ou chat pour contacter les secours.",
-                        hours: "24h/24 — 7j/7",
-                        color: "bg-sage-50 border-sage-200"
-                    }
-                ]
-            },
-            medical: {
-                title: "🏥 Urgence médicale",
-                intro: "En cas d'urgence médicale, le 15 (SAMU) est le bon réflexe. Les PASS assurent des soins même sans papiers.",
-                contacts: [
-                    {
-                        name: "15 — SAMU",
-                        phone: "15",
-                        tel: "15",
-                        desc: "Service d'Aide Médicale d'Urgence. Dispatch les secours médicalisés.",
-                        hours: "24h/24 — 7j/7",
-                        color: "bg-red-50 border-red-200"
-                    },
-                    {
-                        name: "PASS (Permanence d'Accès aux Soins)",
-                        phone: "",
-                        tel: "",
-                        desc: "Soins médicaux GRATUITS, même sans sécurité sociale ni titre de séjour. Dans chaque hôpital public.",
-                        hours: "Renseignez-vous auprès de l'hôpital le plus proche",
-                        color: "bg-brand-50 border-brand-200"
-                    },
-                    {
-                        name: "Médecins du Monde",
-                        phone: "01 44 92 15 15",
-                        tel: "0033144921515",
-                        desc: "Soins médicaux, consultations et accompagnement pour les personnes exclues du système de santé.",
-                        hours: "Variable selon centre",
-                        color: "bg-sage-50 border-sage-200"
-                    }
-                ]
-            },
-            admin: {
-                title: "⚖️ Autre urgence administrative",
-                intro: "Des structures compétentes peuvent vous aider dans vos démarches administratives complexes.",
-                contacts: [
-                    {
-                        name: "Barista IA (Café des Nations)",
-                        phone: "",
-                        tel: "",
-                        desc: "Posez votre question à notre Barista IA pour une analyse préliminaire de votre situation.",
-                        hours: "Disponible 24h/24",
-                        color: "bg-brand-50 border-brand-200",
-                        link: "/ai/",
-                        linkLabel: "Consulter le Barista →"
-                    },
-                    {
-                        name: "Info Droits Migrants",
-                        phone: "01 53 93 14 04",
-                        tel: "0033153931404",
-                        desc: "Renseignements juridiques pour les étrangers en France.",
-                        hours: "Lun, Mer, Jeu 14h-17h",
-                        color: "bg-sage-50 border-sage-200"
-                    },
-                    {
-                        name: "Solidarité Laïque",
-                        phone: "01 45 35 13 13",
-                        tel: "0033145351313",
-                        desc: "Accompagnement scolaire et insertion sociale pour les familles migrantes.",
-                        hours: "Lun-Ven 9h-17h",
-                        color: "bg-sage-50 border-sage-200"
-                    }
-                ]
-            }
-        };
-
-        let activeUrgencyChip = null;
-
-        function openUrgencyPanel() {
-            document.getElementById('urgency-panel').classList.remove('translate-x-full');
-            document.getElementById('urgency-overlay').classList.remove('hidden');
-            document.getElementById('urgency-default').classList.remove('hidden');
-            document.getElementById('urgency-content').classList.add('hidden');
-            // Reset chips
-            document.querySelectorAll('.urgency-chip').forEach(c => c.classList.remove('bg-red-600', 'text-white', 'border-red-600'));
-            activeUrgencyChip = null;
-        }
-
-        function closeUrgencyPanel() {
-            document.getElementById('urgency-panel').classList.add('translate-x-full');
-            document.getElementById('urgency-overlay').classList.add('hidden');
-        }
-
-        function showUrgencyCategory(cat) {
-            const data = URGENCY_DATA[cat];
-            if (!data) return;
-
-            // Update active chip
-            document.querySelectorAll('.urgency-chip').forEach(c => c.classList.remove('bg-red-600', 'text-white', 'border-red-600'));
-            document.getElementById(`chip-${cat}`).classList.add('bg-red-600', 'text-white', 'border-red-600');
-
-            // Hide default, show content
-            document.getElementById('urgency-default').classList.add('hidden');
-            const content = document.getElementById('urgency-content');
-            content.classList.remove('hidden');
-
-            // Build HTML
-            let html = `<h3 class="font-bold text-lg text-sage-900 mb-1">${data.title}</h3>`;
-            html += `<p class="text-sm text-sage-600 mb-4">${data.intro}</p>`;
-
-            data.contacts.forEach(c => {
-                html += `<div class="rounded-2xl border p-4 ${c.color}">`;
-                html += `<div class="flex items-start justify-between gap-2 mb-2">`;
-                html += `<h4 class="font-bold text-sm text-sage-900 leading-snug">${c.name}</h4>`;
-                if (c.phone) {
-                    html += `<a href="tel:${c.tel}" class="shrink-0 bg-green-600 hover:bg-green-700 text-white text-sm font-black px-3 py-1 rounded-xl shadow-sm transition-colors">${c.phone}</a>`;
-                }
-                html += `</div>`;
-                html += `<p class="text-xs text-sage-700 mb-1">${c.desc}</p>`;
-                html += `<p class="text-[11px] text-sage-500 font-medium">⏰ ${c.hours}</p>`;
-                if (c.link) {
-                    html += `<a href="${c.link}" class="inline-block mt-2 text-xs font-bold text-brand-600 hover:text-brand-700">${c.linkLabel}</a>`;
-                }
-                html += `</div>`;
-            });
-
-            content.innerHTML = html;
-        }
-    </script>
 </body>
 </html>

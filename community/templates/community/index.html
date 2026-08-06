@@ -1,88 +1,581 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}La Grande Salle - Café des Nations{% endblock %}
 
-{% block content %}
-    <main class="flex-1 max-w-6xl mx-auto w-full p-4 md:p-8 flex flex-col items-center justify-start md:justify-center overflow-y-auto">
-        
-        <div class="text-center mb-10 mt-6 md:mt-0 animate-fade-in-up">
-            <h1 class="text-3xl md:text-5xl font-extrabold text-sage-900 mb-4 font-serif">La Grande Salle 🛋️</h1>
-            <p class="text-coffee-800 max-w-xl mx-auto text-lg">Rejoignez notre communauté grandissante d'étrangers en France. Posez vos questions, partagez vos expériences, et trouvez du soutien dans un espace bienveillant.</p>
-        </div>
+{% block extra_head %}
+<style>
+    .tab-btn.active {
+        background-color: #2F5D50;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(47, 93, 80, 0.2);
+    }
+    .post-card {
+        transition: all 0.2s ease-in-out;
+    }
+    .post-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(47, 93, 80, 0.08);
+    }
+</style>
+{% endblock %}
 
-        <div class="bg-white rounded-[2rem] shadow-card overflow-hidden max-w-5xl w-full border border-sage-100 flex flex-col lg:flex-row animate-fade-in-up" style="animation-delay: 0.1s;">
-            <!-- Left side / Top banner -->
-            <div class="bg-sage-900 p-8 lg:p-12 lg:w-[45%] flex flex-col items-center justify-center text-center text-white relative overflow-hidden">
-                <!-- Decorative background elements -->
-                <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, #FBF4EA 1px, transparent 0); background-size: 24px 24px;"></div>
-                <div class="absolute -top-24 -left-24 w-64 h-64 bg-sage-500 rounded-full mix-blend-overlay filter blur-3xl opacity-50"></div>
-                <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-brand-500 rounded-full mix-blend-overlay filter blur-3xl opacity-30"></div>
-                
-                <div class="w-24 h-24 mb-6 z-10 bg-white/10 backdrop-blur-sm rounded-3xl flex items-center justify-center border border-white/20">
-                    <svg class="w-12 h-12 text-brand-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10c0-5.52-4.48-10-10-10zm4.5 14H7.5c-.83 0-1.5-.67-1.5-1.5V9.5c0-.83.67-1.5 1.5-1.5h9c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5zM12 4.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5S10.5 6.83 10.5 6 11.17 4.5 12 4.5z"/></svg>
+{% block content %}
+<div class="flex-1 overflow-y-auto bg-coffee-50/50 pb-20 md:pb-12">
+    
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-b from-coffee-50 via-sage-50/40 to-transparent border-b border-sage-100/60 py-8 md:py-12 px-4 md:px-8">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="text-center md:text-left max-w-2xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sage-100 text-sage-800 text-xs font-semibold mb-3 border border-sage-200">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    Salons en direct & Entraide 24/7
                 </div>
-                
-                <h2 class="text-3xl font-serif font-bold mb-3 z-10 text-coffee-50">Prenez place à une table</h2>
-                
-                <!-- Live Preview Widget -->
-                <div class="bg-sage-800/80 backdrop-blur-sm border border-sage-700 rounded-2xl p-4 w-full mt-6 mb-8 z-10">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-2">
-                            <span class="flex h-3 w-3 relative">
-                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-                              <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-500"></span>
-                            </span>
-                            <span class="text-sm font-bold text-sage-100">En direct sur Discord</span>
-                        </div>
-                        <span class="text-xs font-medium bg-sage-700 px-2 py-1 rounded text-sage-200">Salons actifs</span>
-                    </div>
-                    
-                    <div class="flex -space-x-2 overflow-hidden justify-center mb-2">
-                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-sage-800" src="https://ui-avatars.com/api/?name=Ahmad&background=F4A950&color=fff" alt="">
-                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-sage-800" src="https://ui-avatars.com/api/?name=Maria&background=E8622C&color=fff" alt="">
-                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-sage-800" src="https://ui-avatars.com/api/?name=Chen&background=2F5D50&color=fff" alt="">
-                        <img class="inline-block h-8 w-8 rounded-full ring-2 ring-sage-800" src="https://ui-avatars.com/api/?name=Sonia&background=C74A1A&color=fff" alt="">
-                    </div>
-                    <p class="text-xs text-sage-300">De nombreux membres échangent en ce moment...</p>
-                </div>
-                
-                <a href="https://discord.gg/3zdSrS85F" target="_blank" rel="noopener noreferrer" class="w-full text-center bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-[0_10px_20px_-10px_rgba(232,98,44,0.5)] hover:-translate-y-1 z-10 flex items-center justify-center gap-2">
-                    Ouvrir la porte (Discord)
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                <h1 class="text-3xl md:text-5xl font-serif font-extrabold text-sage-900 tracking-tight leading-tight mb-3">
+                    La Grande Salle 🛋️
+                </h1>
+                <p class="text-coffee-800 text-base md:text-lg leading-relaxed">
+                    L'espace d'échange et de soutien mutuel pour toutes vos questions sur la vie en France. Poser une question, partager une astuce ou simplement échanger avec d'autres habitués.
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto shrink-0">
+                <button onclick="openNewPostModal()" class="w-full sm:w-auto px-6 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Poser une question
+                </button>
+                <a href="https://discord.gg/3zdSrS85F" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-6 py-3.5 bg-white border border-sage-200 hover:bg-sage-50 text-sage-900 font-bold rounded-2xl transition-all shadow-sm flex items-center justify-center gap-2 text-sm">
+                    <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                    Rejoindre le Discord
                 </a>
             </div>
-            
-            <!-- Right side / Tables -->
-            <div class="p-8 lg:p-12 lg:w-[55%] flex flex-col justify-center bg-white">
-                <h3 class="text-2xl font-serif font-bold text-sage-900 mb-6">Les tables de discussion</h3>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="p-5 border border-sage-100 rounded-2xl bg-coffee-50 hover:bg-white hover:border-brand-300 hover:shadow-soft transition-all cursor-default group">
-                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl mb-4 shadow-sm border border-sage-100 group-hover:scale-110 transition-transform">📄</div>
-                        <h4 class="font-bold text-sage-900 mb-1">Le Comptoir Administratif</h4>
-                        <p class="text-sm text-coffee-800">Entraide sur les dossiers en préfecture (renouvellements, naturalisation).</p>
-                    </div>
-                    
-                    <div class="p-5 border border-sage-100 rounded-2xl bg-coffee-50 hover:bg-white hover:border-brand-300 hover:shadow-soft transition-all cursor-default group">
-                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl mb-4 shadow-sm border border-sage-100 group-hover:scale-110 transition-transform">🔑</div>
-                        <h4 class="font-bold text-sage-900 mb-1">Le Coin Logement</h4>
-                        <p class="text-sm text-coffee-800">Astuces pour trouver un garant, monter un dossier béton.</p>
-                    </div>
-                    
-                    <div class="p-5 border border-sage-100 rounded-2xl bg-coffee-50 hover:bg-white hover:border-brand-300 hover:shadow-soft transition-all cursor-default group">
-                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl mb-4 shadow-sm border border-sage-100 group-hover:scale-110 transition-transform">💼</div>
-                        <h4 class="font-bold text-sage-900 mb-1">Le Bureau Emploi</h4>
-                        <p class="text-sm text-coffee-800">CV à la française, entretiens, changement de statut salarié.</p>
-                    </div>
-                    
-                    <div class="p-5 border border-sage-100 rounded-2xl bg-coffee-50 hover:bg-white hover:border-brand-300 hover:shadow-soft transition-all cursor-default group">
-                        <div class="text-2xl mb-2 grayscale group-hover:grayscale-0 transition-all">🎓</div>
-                        <h4 class="font-bold text-sage-900 mb-1">La Vie Étudiante</h4>
-                        <p class="text-sm text-coffee-800">Jobs étudiants, CROUS, vie de campus, bons plans.</p>
-                    </div>
+        </div>
+
+        <!-- Community Stats Bar -->
+        <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+            <div class="bg-white p-4 rounded-2xl border border-sage-100 shadow-sm flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-sage-100 text-sage-700 flex items-center justify-center text-xl shrink-0">👥</div>
+                <div>
+                    <div class="text-base font-bold text-sage-900">1 240+</div>
+                    <div class="text-xs text-sage-600">Membres actifs</div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-sage-100 shadow-sm flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-xl shrink-0">💬</div>
+                <div>
+                    <div class="text-base font-bold text-sage-900">85+</div>
+                    <div class="text-xs text-sage-600">Réponses / jour</div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-sage-100 shadow-sm flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl shrink-0">⚡</div>
+                <div>
+                    <div class="text-base font-bold text-sage-900">&lt; 15 min</div>
+                    <div class="text-xs text-sage-600">Temps de réponse</div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-sage-100 shadow-sm flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-xl shrink-0">🤝</div>
+                <div>
+                    <div class="text-base font-bold text-sage-900">100%</div>
+                    <div class="text-xs text-sage-600">Bienveillance</div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Main Container Grid -->
+    <div class="max-w-6xl mx-auto px-4 md:px-8 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-    </main>
+        <!-- Left Column: Discussions & Feed (2 Cols on lg) -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Filters & Search Header -->
+            <div class="bg-white p-4 rounded-2xl border border-sage-100 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                
+                <!-- Category Filter Pills -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none text-xs font-medium">
+                    <button onclick="filterPosts('all')" id="tab-all" class="tab-btn active px-3.5 py-2 rounded-xl border border-sage-200 text-sage-700 hover:bg-sage-100 shrink-0 transition-colors">Toutes</button>
+                    <button onclick="filterPosts('demarches')" id="tab-demarches" class="tab-btn px-3.5 py-2 rounded-xl border border-sage-200 text-sage-700 hover:bg-sage-100 shrink-0 transition-colors">📄 Démarches</button>
+                    <button onclick="filterPosts('logement')" id="tab-logement" class="tab-btn px-3.5 py-2 rounded-xl border border-sage-200 text-sage-700 hover:bg-sage-100 shrink-0 transition-colors">🏠 Logement</button>
+                    <button onclick="filterPosts('emploi')" id="tab-emploi" class="tab-btn px-3.5 py-2 rounded-xl border border-sage-200 text-sage-700 hover:bg-sage-100 shrink-0 transition-colors">💼 Emploi</button>
+                    <button onclick="filterPosts('etudiant')" id="tab-etudiant" class="tab-btn px-3.5 py-2 rounded-xl border border-sage-200 text-sage-700 hover:bg-sage-100 shrink-0 transition-colors">🎓 Étudiant</button>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative shrink-0 md:w-56">
+                    <svg class="w-4 h-4 text-sage-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="postSearch" onkeyup="searchPosts()" placeholder="Rechercher..." class="w-full pl-9 pr-3 py-2 bg-coffee-50 border border-sage-200 rounded-xl text-xs text-sage-900 focus:outline-none focus:border-brand-500">
+                </div>
+            </div>
+
+            <!-- Feed Container -->
+            <div id="postsFeed" class="space-y-4">
+                <!-- Posts rendered dynamically via JavaScript -->
+            </div>
+
+        </div>
+
+        <!-- Right Column: Sidebar Widgets (1 Col on lg) -->
+        <div class="space-y-6">
+            
+            <!-- Widget 1: Discord Salons / Tables d'échange -->
+            <div class="bg-white p-6 rounded-3xl border border-sage-100 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-serif font-bold text-lg text-sage-900 flex items-center gap-2">
+                        <span>🛋️</span> Tables de discussion
+                    </h3>
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">En direct</span>
+                </div>
+
+                <div class="space-y-3">
+                    <a href="https://discord.gg/3zdSrS85F" target="_blank" class="flex items-center justify-between p-3 rounded-2xl bg-coffee-50 hover:bg-sage-100/60 border border-sage-100 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">📄</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-sage-900 group-hover:text-brand-600 transition-colors">Salon Préfecture & Visas</h4>
+                                <p class="text-[11px] text-sage-600">Délais ANEF, titres de séjour</p>
+                            </div>
+                        </div>
+                        <span class="text-[11px] font-semibold text-sage-500">34 en ligne</span>
+                    </a>
+
+                    <a href="https://discord.gg/3zdSrS85F" target="_blank" class="flex items-center justify-between p-3 rounded-2xl bg-coffee-50 hover:bg-sage-100/60 border border-sage-100 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">🏠</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-sage-900 group-hover:text-brand-600 transition-colors">Salon Logement & Visale</h4>
+                                <p class="text-[11px] text-sage-600">Recherche d'appart, garants</p>
+                            </div>
+                        </div>
+                        <span class="text-[11px] font-semibold text-sage-500">28 en ligne</span>
+                    </a>
+
+                    <a href="https://discord.gg/3zdSrS85F" target="_blank" class="flex items-center justify-between p-3 rounded-2xl bg-coffee-50 hover:bg-sage-100/60 border border-sage-100 transition-all group">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">💼</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-sage-900 group-hover:text-brand-600 transition-colors">Salon Emploi & Alternance</h4>
+                                <p class="text-[11px] text-sage-600">Autorisations de travail, CV</p>
+                            </div>
+                        </div>
+                        <span class="text-[11px] font-semibold text-sage-500">19 en ligne</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Widget 2: Barista Weekly Advice -->
+            <div class="bg-gradient-to-br from-sage-900 to-sage-800 text-white p-6 rounded-3xl shadow-md relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl"></div>
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-lg">💡</span>
+                    <span class="text-xs font-bold text-brand-300 uppercase tracking-wider">Astuce du Barista</span>
+                </div>
+                <h4 class="font-serif font-bold text-base text-coffee-50 mb-2">Pensez au renouvellement à J-90 !</h4>
+                <p class="text-xs text-sage-200 leading-relaxed mb-4">
+                    La majorité des sous-préfectures ouvrent les rendez-vous ANEF 2 à 3 mois avant la date d'expiration. N'attendez pas la dernière minute.
+                </p>
+                <a href="/ai/" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-400 hover:text-brand-300 transition-colors">
+                    Demander conseil au Barista →
+                </a>
+            </div>
+
+            <!-- Widget 3: Top Contributors -->
+            <div class="bg-white p-6 rounded-3xl border border-sage-100 shadow-sm">
+                <h3 class="font-serif font-bold text-base text-sage-900 mb-4 flex items-center gap-2">
+                    <span>🏆</span> Top Membres Entraide
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <img class="w-8 h-8 rounded-full" src="https://ui-avatars.com/api/?name=Karim+M&background=E8622C&color=fff" alt="Karim">
+                            <div>
+                                <div class="text-xs font-bold text-sage-900">Karim M. 🇲🇦</div>
+                                <div class="text-[10px] text-sage-500">42 réponses utiles</div>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">🥇 320 ☕</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <img class="w-8 h-8 rounded-full" src="https://ui-avatars.com/api/?name=Aminata+D&background=2F5D50&color=fff" alt="Aminata">
+                            <div>
+                                <div class="text-xs font-bold text-sage-900">Aminata D. 🇸🇳</div>
+                                <div class="text-[10px] text-sage-500">29 réponses utiles</div>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-full border border-slate-200">🥈 240 ☕</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <img class="w-8 h-8 rounded-full" src="https://ui-avatars.com/api/?name=Elena+P&background=F4A950&color=fff" alt="Elena">
+                            <div>
+                                <div class="text-xs font-bold text-sage-900">Elena P. 🇺🇦</div>
+                                <div class="text-[10px] text-sage-500">18 réponses utiles</div>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-amber-700 bg-amber-50/50 px-2 py-0.5 rounded-full border border-amber-100">🥉 175 ☕</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- =====================================================
+     MODAL : NEW QUESTION / DISCUSSION
+====================================================== -->
+<div id="new-post-modal" class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-sage-900/40 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg border border-sage-100 overflow-hidden relative p-6 md:p-8">
+        <button onclick="closeNewPostModal()" class="absolute top-4 right-4 text-sage-400 hover:text-sage-700 font-bold text-xl leading-none">&times;</button>
+        
+        <h3 class="text-2xl font-serif font-bold text-sage-900 mb-2 flex items-center gap-2">
+            <span>💬</span> Poser une question
+        </h3>
+        <p class="text-xs text-coffee-800 mb-6">La communauté et le Barista IA vous répondront rapidement.</p>
+
+        <form onsubmit="submitNewPost(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-sage-900 mb-1">Votre Prénom ou Pseudo</label>
+                <input type="text" id="post-author" required placeholder="Ex: Yacine (🇲🇦)" class="w-full bg-coffee-50 border border-sage-200 rounded-xl p-3 text-xs text-sage-900 focus:outline-none focus:border-brand-500">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-sage-900 mb-1">Catégorie</label>
+                <select id="post-category" required class="w-full bg-coffee-50 border border-sage-200 rounded-xl p-3 text-xs text-sage-900 focus:outline-none focus:border-brand-500">
+                    <option value="demarches">📄 Démarches & Préfecture</option>
+                    <option value="logement">🏠 Logement & Visale</option>
+                    <option value="emploi">💼 Emploi & Changement de statut</option>
+                    <option value="etudiant">🎓 Vie Étudiante & Jobs</option>
+                    <option value="bons_plans">💡 Bons plans & Entraide</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-sage-900 mb-1">Titre de votre question</label>
+                <input type="text" id="post-title" required placeholder="Ex: Combien de temps prend le récépissé de renouvellement ?" class="w-full bg-coffee-50 border border-sage-200 rounded-xl p-3 text-xs text-sage-900 focus:outline-none focus:border-brand-500">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-sage-900 mb-1">Détails de votre situation</label>
+                <textarea id="post-content" rows="4" required placeholder="Précisez votre statut, la ville et les détails de votre demande..." class="w-full bg-coffee-50 border border-sage-200 rounded-xl p-3 text-xs text-sage-900 focus:outline-none focus:border-brand-500"></textarea>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button type="button" onclick="closeNewPostModal()" class="px-5 py-2.5 rounded-xl border border-sage-200 text-sage-600 text-xs font-bold hover:bg-sage-50">Annuler</button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-colors shadow-md">Publier ma question</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Mock Default Posts
+    const DEFAULT_POSTS = [
+        {
+            id: 101,
+            author: "Yacine B. 🇲🇦",
+            avatar: "https://ui-avatars.com/api/?name=Yacine+B&background=2F5D50&color=fff",
+            category: "demarches",
+            categoryLabel: "📄 Démarches",
+            title: "Récépissé ANEF pas reçu après 2 mois de demande de renouvellement : que faire ?",
+            content: "Bonjour à tous ! J'ai déposé mon dossier de renouvellement de VLS-TS étudiant sur l'ANEF il y a 2 mois à la préfecture de Lyon. Mon titre actuel expire dans 10 jours et je n'ai toujours pas reçu l'Attestation de Prolongation d'Instruction (API). Est-ce normal ?",
+            date: "Il y a 2 heures",
+            likes: 12,
+            replies: [
+                {
+                    author: "Barista IA ☕",
+                    badge: "Officiel",
+                    content: "Bonjour Yacine ! Pas de panique. L'Attestation de Prolongation d'Instruction (API) est téléchargeable directement sur votre espace ANEF dès que la préfecture valide le dossier complet. Vous pouvez également relancer via le formulaire de contact ANEF."
+                },
+                {
+                    author: "Sonia K. 🇩🇿",
+                    badge: "Membre",
+                    content: "À Lyon ça prend souvent entre 6 et 8 semaines. Vérifie bien l'onglet 'Mes démarches' sur ANEF !"
+                }
+            ]
+        },
+        {
+            id: 102,
+            author: "Sarah L. 🇹🇳",
+            avatar: "https://ui-avatars.com/api/?name=Sarah+L&background=E8622C&color=fff",
+            category: "logement",
+            categoryLabel: "🏠 Logement",
+            title: "Garantie Visale refusée sans garant physique : quelles alternatives crédibles ?",
+            content: "Je viens d'arriver pour un Master à Paris. Mon dossier Visale est validé mais le propriétaire exige malgré tout un garant physique résidant en France. Quels recours avez-vous utilisés dans ce cas ?",
+            date: "Il y a 5 heures",
+            likes: 8,
+            replies: [
+                {
+                    author: "Amine T. 🇲🇦",
+                    badge: "Membre",
+                    content: "Tu peux lui proposer Garantme ou Unkle, ou lui rappeler que la Garantie Visale est couverte à 100% par Action Logement sans frais pour le bailleur !"
+                }
+            ]
+        },
+        {
+            id: 103,
+            author: "Mamadou S. 🇸🇳",
+            avatar: "https://ui-avatars.com/api/?name=Mamadou+S&background=F4A950&color=fff",
+            category: "emploi",
+            categoryLabel: "💼 Emploi",
+            title: "Changement de statut Étudiant vers Salarié : délai moyen de l'autorisation de travail ?",
+            content: "J'ai signé une promesse d'embauche CDI en tant qu'ingénieur logiciel à Lille. Mon employeur a fait la demande d'autorisation de travail en ligne. Combien de temps cela prend-il actuellement ?",
+            date: "Hier à 16:40",
+            likes: 15,
+            replies: [
+                {
+                    author: "Lucie V. 🇫🇷",
+                    badge: "Guide Local",
+                    content: "Si le salaire dépasse 1,5 x le SMIC, le changement de statut est de droit et prend environ 3 à 4 semaines !"
+                }
+            ]
+        },
+        {
+            id: 104,
+            author: "Olena K. 🇺🇦",
+            avatar: "https://ui-avatars.com/api/?name=Olena+K&background=2F5D50&color=fff",
+            category: "etudiant",
+            categoryLabel: "🎓 Étudiant",
+            title: "Demande de bourse CROUS et logement universitaire pour les étudiants internationaux",
+            content: "Est-ce que les étudiants non-UE ont accès aux logements CROUS en cours d'année universitaire si une place se libère ?",
+            date: "Il y a 2 jours",
+            likes: 6,
+            replies: []
+        }
+    ];
+
+    let currentCategory = 'all';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderPosts();
+    });
+
+    function getPosts() {
+        const stored = localStorage.getItem('cn_community_posts');
+        if (stored) {
+            try {
+                const userPosts = JSON.parse(stored);
+                return [...userPosts, ...DEFAULT_POSTS];
+            } catch(e) {
+                return DEFAULT_POSTS;
+            }
+        }
+        return DEFAULT_POSTS;
+    }
+
+    function renderPosts() {
+        const feed = document.getElementById('postsFeed');
+        const posts = getPosts();
+        const searchTerm = document.getElementById('postSearch').value.toLowerCase();
+
+        const filtered = posts.filter(post => {
+            const matchCat = (currentCategory === 'all') || (post.category === currentCategory);
+            const matchSearch = post.title.toLowerCase().includes(searchTerm) || post.content.toLowerCase().includes(searchTerm);
+            return matchCat && matchSearch;
+        });
+
+        if (filtered.length === 0) {
+            feed.innerHTML = `
+                <div class="bg-white rounded-2xl border border-sage-100 p-8 text-center">
+                    <span class="text-4xl">🔍</span>
+                    <h4 class="font-bold text-sage-900 mt-2">Aucune discussion trouvée</h4>
+                    <p class="text-xs text-sage-600 mt-1 mb-4">Soyez le premier à poser une question dans cette catégorie !</p>
+                    <button onclick="openNewPostModal()" class="px-4 py-2 bg-brand-600 text-white font-bold rounded-xl text-xs">Poser une question</button>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        filtered.forEach(post => {
+            html += `
+                <div class="post-card bg-white p-5 md:p-6 rounded-3xl border border-sage-100 shadow-sm space-y-4">
+                    <!-- Post Header -->
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <img class="w-10 h-10 rounded-full border border-sage-100 shadow-xs" src="${post.avatar}" alt="${post.author}">
+                            <div>
+                                <h4 class="text-xs font-bold text-sage-900">${post.author}</h4>
+                                <span class="text-[10px] text-sage-500 font-medium">${post.date}</span>
+                            </div>
+                        </div>
+                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-coffee-50 text-sage-700 border border-sage-100">${post.categoryLabel || 'Démarches'}</span>
+                    </div>
+
+                    <!-- Post Title & Content -->
+                    <div>
+                        <h3 class="font-serif font-bold text-base md:text-lg text-sage-900 mb-1.5 leading-snug">${escapeHtml(post.title)}</h3>
+                        <p class="text-xs text-coffee-800 leading-relaxed">${escapeHtml(post.content)}</p>
+                    </div>
+
+                    <!-- Post Footer Action Bar -->
+                    <div class="flex items-center justify-between pt-3 border-t border-sage-50 text-xs">
+                        <div class="flex items-center gap-4">
+                            <button onclick="likePost(${post.id})" class="flex items-center gap-1.5 text-sage-600 hover:text-brand-600 transition-colors font-medium">
+                                <span>☕ Utile</span>
+                                <span id="like-count-${post.id}" class="font-bold text-sage-900 bg-sage-100 px-2 py-0.5 rounded-full text-[11px]">${post.likes}</span>
+                            </button>
+                            <span class="text-sage-300">•</span>
+                            <span class="text-sage-600 font-medium">${post.replies.length} réponse${post.replies.length > 1 ? 's' : ''}</span>
+                        </div>
+                        <button onclick="toggleReplies(${post.id})" class="text-brand-600 font-bold hover:text-brand-700 text-xs flex items-center gap-1">
+                            Voir les réponses (${post.replies.length})
+                        </button>
+                    </div>
+
+                    <!-- Replies Section (hidden by default unless expanded or HAS barista reply) -->
+                    <div id="replies-${post.id}" class="hidden space-y-3 pt-3 border-t border-sage-100 bg-coffee-50/50 p-4 rounded-2xl">
+                        ${post.replies.map(r => `
+                            <div class="bg-white p-3 rounded-xl border border-sage-100 text-xs space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-sage-900 flex items-center gap-1.5">
+                                        ${r.author}
+                                        ${r.badge ? `<span class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-brand-100 text-brand-700 uppercase">${r.badge}</span>` : ''}
+                                    </span>
+                                </div>
+                                <p class="text-coffee-800 text-xs leading-relaxed">${escapeHtml(r.content)}</p>
+                            </div>
+                        `).join('')}
+
+                        <!-- Quick Inline Reply Form -->
+                        <div class="flex gap-2 pt-2">
+                            <input type="text" id="reply-input-${post.id}" placeholder="Répondre à cette question..." class="flex-1 bg-white border border-sage-200 rounded-xl px-3 py-2 text-xs text-sage-900 focus:outline-none focus:border-brand-500">
+                            <button onclick="addReply(${post.id})" class="bg-sage-900 hover:bg-sage-800 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors">Répondre</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        feed.innerHTML = html;
+    }
+
+    function filterPosts(cat) {
+        currentCategory = cat;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`tab-${cat}`).classList.add('active');
+        renderPosts();
+    }
+
+    function searchPosts() {
+        renderPosts();
+    }
+
+    function toggleReplies(id) {
+        const el = document.getElementById(`replies-${id}`);
+        if(el) el.classList.toggle('hidden');
+    }
+
+    function likePost(id) {
+        const countEl = document.getElementById(`like-count-${id}`);
+        if (countEl) {
+            let val = parseInt(countEl.innerText) || 0;
+            countEl.innerText = val + 1;
+            // Award beans logic simulation
+            let beans = parseInt(localStorage.getItem('cn_beans')) || 100;
+            localStorage.setItem('cn_beans', beans + 5);
+        }
+    }
+
+    function openNewPostModal() {
+        document.getElementById('new-post-modal').classList.remove('hidden');
+    }
+
+    function closeNewPostModal() {
+        document.getElementById('new-post-modal').classList.add('hidden');
+    }
+
+    function submitNewPost(e) {
+        e.preventDefault();
+        const author = document.getElementById('post-author').value.trim();
+        const category = document.getElementById('post-category').value;
+        const title = document.getElementById('post-title').value.trim();
+        const content = document.getElementById('post-content').value.trim();
+
+        const categoryLabels = {
+            demarches: '📄 Démarches',
+            logement: '🏠 Logement',
+            emploi: '💼 Emploi',
+            etudiant: '🎓 Étudiant',
+            bons_plans: '💡 Bons plans'
+        };
+
+        const newPost = {
+            id: Date.now(),
+            author: author || "Habitué",
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(author)}&background=E8622C&color=fff`,
+            category: category,
+            categoryLabel: categoryLabels[category] || 'Démarches',
+            title: title,
+            content: content,
+            date: "À l'instant",
+            likes: 1,
+            replies: [
+                {
+                    author: "Barista IA ☕",
+                    badge: "IA Officielle",
+                    content: "Merci pour votre question ! Le Barista analyse les éléments de votre demande pour vous répondre dans quelques instants."
+                }
+            ]
+        };
+
+        let userPosts = [];
+        try {
+            userPosts = JSON.parse(localStorage.getItem('cn_community_posts')) || [];
+        } catch(err) {
+            userPosts = [];
+        }
+        userPosts.unshift(newPost);
+        localStorage.setItem('cn_community_posts', JSON.stringify(userPosts));
+
+        // Reset form & close
+        document.getElementById('post-title').value = '';
+        document.getElementById('post-content').value = '';
+        closeNewPostModal();
+
+        // Re-render feed
+        renderPosts();
+    }
+
+    function addReply(postId) {
+        const input = document.getElementById(`reply-input-${postId}`);
+        if (!input || !input.value.trim()) return;
+
+        const replyText = input.value.trim();
+        let userPosts = [];
+        try {
+            userPosts = JSON.parse(localStorage.getItem('cn_community_posts')) || [];
+        } catch(err) {}
+
+        // Check default posts or user posts
+        const posts = getPosts();
+        const target = posts.find(p => p.id === postId);
+        if (target) {
+            target.replies.push({
+                author: "Vous ☕",
+                badge: "Moi",
+                content: replyText
+            });
+            localStorage.setItem('cn_community_posts', JSON.stringify(userPosts.concat([target])));
+        }
+
+        input.value = '';
+        renderPosts();
+        // Keep replies open
+        setTimeout(() => {
+            const el = document.getElementById(`replies-${postId}`);
+            if(el) el.classList.remove('hidden');
+        }, 50);
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+</script>
 {% endblock %}

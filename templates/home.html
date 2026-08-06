@@ -5,27 +5,6 @@
 
 {% block extra_head %}
 <style>
-    /* Coffee Steam Animation */
-    .steam {
-        position: absolute;
-        width: 8px;
-        height: 8px;
-        background: #F4A950;
-        border-radius: 50%;
-        animation: steam-rise 3s infinite ease-in;
-        opacity: 0;
-    }
-    .steam:nth-child(1) { left: 40%; animation-delay: 0.2s; }
-    .steam:nth-child(2) { left: 50%; animation-delay: 1.5s; width: 6px; height: 6px; }
-    .steam:nth-child(3) { left: 60%; animation-delay: 0.8s; width: 10px; height: 10px; }
-    
-    @keyframes steam-rise {
-        0% { transform: translateY(0) scale(1); opacity: 0; }
-        20% { opacity: 0.6; }
-        80% { opacity: 0.4; }
-        100% { transform: translateY(-30px) scale(3); opacity: 0; }
-    }
-    
     .card-hover:hover {
         transform: translateY(-4px);
         box-shadow: 0 12px 24px -10px rgba(47, 93, 80, 0.15);
@@ -43,8 +22,6 @@
         <div class="absolute top-20 -right-10 w-80 h-80 bg-sage-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
 
         <div class="max-w-4xl mx-auto px-6 pt-16 pb-20 md:pt-24 relative z-10 text-center">
-            
-            <img src="{% static 'images/logo.png' %}" alt="Café des Nations" class="h-24 mx-auto mb-6 drop-shadow-md">
             
             <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white border border-sage-200 text-sage-700 text-sm font-medium mb-8 shadow-sm">
                 <span class="flex h-2 w-2 relative">
@@ -64,14 +41,8 @@
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <!-- CTA Primary with micro-interaction -->
-                <button onclick="openOnboarding()" class="group relative w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl transition-all btn-hover-steam flex items-center justify-center gap-3">
-                    <div class="relative">
-                        <span class="text-xl">☕</span>
-                        <div class="steam"></div>
-                        <div class="steam"></div>
-                        <div class="steam"></div>
-                    </div>
+                <!-- CTA Primary -->
+                <button onclick="openOnboarding()" class="w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl transition-all shadow-md flex items-center justify-center text-center">
                     Commander mon conseil
                 </button>
                 
