@@ -11,7 +11,6 @@
             box-shadow: 0 4px 20px rgba(47, 93, 80, 0.15);
         }
         
-        /* Custom UI popup */
         .poi-panel {
             transform: translateX(110%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -19,42 +18,50 @@
         .poi-panel.open {
             transform: translateX(0);
         }
+
+        .filter-chip {
+            transition: all 0.2s ease;
+        }
+        .filter-chip.active {
+            background-color: #E8622C;
+            color: white;
+            border-color: #E8622C;
+        }
     </style>
 {% endblock %}
 
 {% block content %}
-    <!-- Map Area -->
     <main class="flex-1 relative overflow-hidden">
         <div id="map" class="w-full z-10 relative"></div>
         
-        <!-- Search Bar Overlay (Top) -->
+        <!-- Search Bar -->
         <div class="absolute top-6 left-1/2 transform -translate-x-1/2 z-[400] w-full max-w-md px-4">
-            <div class="bg-white map-search rounded-2xl flex items-center p-2 border border-sage-100">
+            <form id="search-form" class="bg-white map-search rounded-2xl flex items-center p-2 border border-sage-100">
                 <div class="text-sage-400 pl-3 pr-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
-                <input type="text" placeholder="Chercher une ville, code postal..." class="flex-1 bg-transparent border-0 focus:ring-0 text-sage-900 placeholder-sage-400 font-medium py-2">
-                <button class="bg-brand-600 hover:bg-brand-700 text-white rounded-xl px-4 py-2 text-sm font-bold transition-colors">
+                <input type="text" id="search-input" placeholder="Chercher une ville (Lille, Paris...)" class="flex-1 bg-transparent border-0 focus:ring-0 text-sage-900 placeholder-sage-400 font-medium py-2">
+                <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white rounded-xl px-4 py-2 text-sm font-bold transition-colors">
                     Rechercher
                 </button>
-            </div>
+            </form>
             
             <!-- Quick Filters (Chips) -->
-            <div class="flex gap-2 mt-3 overflow-x-auto pb-2 scrollbar-hide">
-                <button class="shrink-0 bg-white border border-brand-200 text-brand-700 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">Préfectures (12)</button>
-                <button class="shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">CAF (34)</button>
-                <button class="shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">Assurance Maladie</button>
+            <div class="flex gap-2 mt-3 overflow-x-auto pb-2 scrollbar-hide" id="filters-container">
+                <button data-type="Préfecture" class="filter-chip shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">Préfectures</button>
+                <button data-type="CAF" class="filter-chip shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">CAF</button>
+                <button data-type="Assurance Maladie" class="filter-chip shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">CPAM</button>
+                <button data-type="CROUS" class="filter-chip shrink-0 bg-white border border-sage-200 text-sage-600 px-3 py-1.5 rounded-full text-xs font-medium shadow-sm hover:border-sage-300">CROUS</button>
             </div>
         </div>
         
-        <!-- Detail Panel (Side/Bottom) -->
+        <!-- Detail Panel -->
         <div id="poi-detail" class="poi-panel absolute top-0 right-0 bottom-0 w-full md:w-96 bg-white z-[500] shadow-2xl border-l border-sage-100 flex flex-col">
-            <!-- Header -->
             <div class="p-4 border-b border-sage-100 flex justify-between items-start bg-coffee-50 relative">
                 <div>
                     <span class="inline-block px-2.5 py-1 bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider rounded-lg mb-2" id="poi-status">Forte Affluence</span>
-                    <h2 class="font-serif font-bold text-xl text-sage-900 leading-tight" id="poi-name">Préfecture de Police</h2>
-                    <p class="text-sm text-sage-500 mt-1" id="poi-type">Guichet Étrangers</p>
+                    <h2 class="font-serif font-bold text-xl text-sage-900 leading-tight" id="poi-name">Nom</h2>
+                    <p class="text-sm text-sage-500 mt-1" id="poi-type">Type</p>
                 </div>
                 <button onclick="closePoiDetail()" class="text-sage-400 hover:text-sage-700 p-2 bg-white rounded-full shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -62,7 +69,6 @@
             </div>
             
             <div class="flex-1 overflow-y-auto p-5">
-                <!-- Live Wait Time -->
                 <div class="bg-white border border-sage-100 rounded-2xl p-4 shadow-sm mb-6 flex items-center justify-between">
                     <div>
                         <p class="text-[11px] font-bold text-sage-500 uppercase tracking-wide">Attente estimée</p>
@@ -73,66 +79,75 @@
                     </div>
                 </div>
                 
-                <!-- Info list -->
                 <div class="space-y-4 mb-6">
                     <div class="flex gap-3 text-sm">
                         <span class="text-sage-400 mt-0.5"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></span>
-                        <p class="text-sage-800" id="poi-address">92 Boulevard Ney, 75018 Paris</p>
+                        <p class="text-sage-800 font-medium" id="poi-address">Adresse complète</p>
                     </div>
                     <div class="flex gap-3 text-sm">
-                        <span class="text-sage-400 mt-0.5"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+                        <span class="text-sage-400 mt-0.5"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
                         <div>
-                            <p class="text-green-600 font-semibold">Ouvert <span class="text-sage-500 font-normal">ferme à 16:00</span></p>
+                            <p class="text-sage-800" id="poi-services">Services</p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Docs required -->
                 <h3 class="font-bold text-sage-900 mb-3 text-sm border-t border-sage-100 pt-4">Documents fréquents :</h3>
                 <ul class="space-y-2 mb-6">
                     <li class="flex items-center gap-2 text-sm text-sage-600 bg-coffee-50 p-2 rounded-lg border border-sage-100">
-                        <span class="text-brand-500">📄</span> Convocation imprimée
+                        <span class="text-brand-500">📄</span> Convocation ou mail imprimé
                     </li>
                     <li class="flex items-center gap-2 text-sm text-sage-600 bg-coffee-50 p-2 rounded-lg border border-sage-100">
-                        <span class="text-brand-500">🎫</span> Passeport + Titre actuel
+                        <span class="text-brand-500">🎫</span> Passeport + Titre de séjour actuel
                     </li>
                     <li class="flex items-center gap-2 text-sm text-sage-600 bg-coffee-50 p-2 rounded-lg border border-sage-100">
-                        <span class="text-brand-500">📸</span> 3 photos d'identité
+                        <span class="text-brand-500">🏠</span> Justificatif de domicile (-3 mois)
                     </li>
                 </ul>
             </div>
             
-            <!-- CTA -->
             <div class="p-4 border-t border-sage-100 bg-white">
-                <a href="#" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md">
+                <a href="#" id="poi-directions" target="_blank" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-                    Y aller (Itinéraire)
+                    Y aller (Google Maps)
                 </a>
             </div>
         </div>
     </main>
 
     <script>
-        // Init Leaflet map centered on Paris
-        const map = L.map('map', {zoomControl: false}).setView([48.8566, 2.3522], 12);
-        
-        // Add zoom control bottom right
+        const map = L.map('map', {zoomControl: false}).setView([46.2276, 2.2137], 6); // Centered on France initially
         L.control.zoom({ position: 'bottomright' }).addTo(map);
         
-        // Add minimal map tiles matching brand colors (CartoDB Positron)
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap contributors & CARTO',
             maxZoom: 19
         }).addTo(map);
 
+        let allPois = [];
+        let markersLayer = L.layerGroup().addTo(map);
+        let activeFilter = null;
+        let activeSearch = '';
+
         const poiPanel = document.getElementById('poi-detail');
 
         function openPoiDetail(poi) {
             document.getElementById('poi-name').innerText = poi.name;
-            document.getElementById('poi-type').innerText = poi.type;
+            document.getElementById('poi-type').innerText = poi.poi_type;
             document.getElementById('poi-wait').innerText = poi.wait_time_minutes;
             
-            // Adjust colors based on wait time
+            // Format address
+            let fullAddress = poi.address ? poi.address : "Adresse non précisée";
+            if(poi.city) fullAddress += `, ${poi.postal_code || ''} ${poi.city}`;
+            document.getElementById('poi-address').innerText = fullAddress;
+            
+            document.getElementById('poi-services').innerText = poi.services_offered || 'Démarches générales';
+            
+            // Directions link
+            const query = encodeURIComponent(fullAddress);
+            document.getElementById('poi-directions').href = `https://www.google.com/maps/dir/?api=1&destination=${query}`;
+            
+            // Colors based on wait time
             const statusEl = document.getElementById('poi-status');
             if (poi.wait_time_minutes > 60) {
                 statusEl.innerText = "Forte affluence";
@@ -147,7 +162,6 @@
             
             poiPanel.classList.add('open');
             
-            // Gamification hook
             if(window.addCoffeeBeans && !sessionStorage.getItem('viewed_map')) {
                 window.addCoffeeBeans(2);
                 sessionStorage.setItem('viewed_map', 'true');
@@ -158,30 +172,88 @@
             poiPanel.classList.remove('open');
         }
 
+        function renderMap() {
+            markersLayer.clearLayers();
+            closePoiDetail();
+            
+            let bounds = [];
+            
+            allPois.forEach(poi => {
+                // Apply filters
+                if (activeFilter && poi.poi_type !== activeFilter) return;
+                
+                if (activeSearch) {
+                    const term = activeSearch.toLowerCase();
+                    const matchCity = poi.city && poi.city.toLowerCase().includes(term);
+                    const matchZip = poi.postal_code && poi.postal_code.includes(term);
+                    const matchName = poi.name.toLowerCase().includes(term);
+                    if (!matchCity && !matchZip && !matchName) return;
+                }
+                
+                let color = poi.wait_time_minutes > 60 ? '#E8622C' : (poi.wait_time_minutes > 30 ? '#F4A950' : '#2F5D50');
+                
+                const marker = L.circleMarker([poi.latitude, poi.longitude], {
+                    radius: 8,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                });
+                
+                marker.on('click', () => openPoiDetail(poi));
+                markersLayer.addLayer(marker);
+                
+                bounds.push([poi.latitude, poi.longitude]);
+            });
+            
+            // Auto zoom to fit markers
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+            } else {
+                // Default view if no results
+                map.setView([46.2276, 2.2137], 6);
+            }
+        }
+
         // Fetch POIs
         fetch('/map/api/pois/')
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {
-                    data.pois.forEach(poi => {
-                        // Create custom circle marker instead of default pin
-                        let color = poi.wait_time_minutes > 60 ? '#E8622C' : (poi.wait_time_minutes > 30 ? '#F4A950' : '#2F5D50');
-                        
-                        const marker = L.circleMarker([poi.latitude, poi.longitude], {
-                            radius: 8,
-                            fillColor: color,
-                            color: '#fff',
-                            weight: 2,
-                            opacity: 1,
-                            fillOpacity: 0.9
-                        }).addTo(map);
-                        
-                        marker.on('click', () => {
-                            openPoiDetail(poi);
-                        });
-                    });
+                    allPois = data.pois;
+                    // Start centered on Paris bounds manually since they asked for it in general
+                    renderMap();
+                    // Initial zoom out slightly after initial render to show France if no search
+                    map.setView([46.2276, 2.2137], 6);
                 }
             })
             .catch(err => console.error(err));
+            
+        // Handle Search
+        document.getElementById('search-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            activeSearch = document.getElementById('search-input').value.trim();
+            renderMap();
+        });
+        
+        // Handle Chips Filter
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                const type = e.target.dataset.type;
+                
+                // Toggle logic
+                if (activeFilter === type) {
+                    activeFilter = null;
+                    e.target.classList.remove('active');
+                } else {
+                    activeFilter = type;
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    e.target.classList.add('active');
+                }
+                
+                renderMap();
+            });
+        });
     </script>
 {% endblock %}

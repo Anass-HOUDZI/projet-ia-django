@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Accueil - Café des Nations{% endblock %}
 
@@ -42,6 +43,8 @@
         <div class="absolute top-20 -right-10 w-80 h-80 bg-sage-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
 
         <div class="max-w-4xl mx-auto px-6 pt-16 pb-20 md:pt-24 relative z-10 text-center">
+            
+            <img src="{% static 'images/logo.png' %}" alt="Café des Nations" class="h-24 mx-auto mb-6 drop-shadow-md">
             
             <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white border border-sage-200 text-sage-700 text-sm font-medium mb-8 shadow-sm">
                 <span class="flex h-2 w-2 relative">
