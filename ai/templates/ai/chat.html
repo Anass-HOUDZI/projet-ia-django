@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Assistant IA - France Étrangers{% endblock %}
+{% block title %}Le Barista - Café des Nations{% endblock %}
 
 {% block extra_head %}
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -13,14 +13,14 @@
             background: transparent;
         }
         .chat-scroll::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
+            background-color: #d1d5db;
             border-radius: 20px;
         }
         .typing-indicator span {
             animation: blink 1.4s infinite both;
             height: 6px;
             width: 6px;
-            background: #94a3b8;
+            background: #9ca3af;
             border-radius: 50%;
             display: inline-block;
             margin: 0 1px;
@@ -32,35 +32,62 @@
             20% { opacity: 1; }
             100% { opacity: 0.2; }
         }
+        
+        .chip {
+            transition: all 0.2s ease;
+        }
+        .chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        
+        .ai-bubble {
+            box-shadow: 0 2px 10px rgba(47, 93, 80, 0.05);
+        }
+        .user-bubble {
+            box-shadow: 0 2px 10px rgba(232, 98, 44, 0.1);
+        }
     </style>
 {% endblock %}
 
 {% block content %}
     <!-- Chat Area -->
-    <main id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 chat-scroll space-y-6 flex flex-col max-w-4xl mx-auto w-full">
+    <main id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 chat-scroll space-y-6 flex flex-col max-w-4xl mx-auto w-full relative">
         
-        <!-- Welcome Message -->
-        <div class="flex flex-col items-center justify-center my-8 text-center opacity-80">
-            <div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mb-4">
-                <span class="text-3xl">☕</span>
+        <!-- Welcome Message & Suggestions -->
+        <div class="flex flex-col items-center justify-center mt-6 mb-10 text-center opacity-90 animate-fade-in-up" id="welcome-screen">
+            <div class="w-20 h-20 bg-brand-100 rounded-3xl flex items-center justify-center mb-5 rotate-3 shadow-sm border border-brand-200">
+                <span class="text-4xl">👨‍🍳</span>
             </div>
-            <h2 class="text-gray-700 font-semibold text-lg">Prenez place, que puis-je vous servir ?</h2>
-            <p class="text-sm text-gray-500 max-w-sm mt-2">Posez vos questions sur vos démarches administratives en France. Je vous sers des réponses claires et précises.</p>
+            <h2 class="text-sage-900 font-serif font-bold text-2xl mb-2">Prenez place, que puis-je vous servir ?</h2>
+            <p class="text-sm text-coffee-800 max-w-md mx-auto mb-8">Posez vos questions sur vos démarches. Je vous sers des réponses claires et sur mesure.</p>
+            
+            <div class="flex flex-wrap justify-center gap-2 max-w-xl">
+                <button onclick="document.getElementById('chat-input').value='Renouveler mon titre de séjour étudiant'; chatForm.dispatchEvent(new Event('submit'));" class="chip bg-white border border-sage-200 text-sage-700 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 px-4 py-2 rounded-full text-sm font-medium">
+                    🔄 Renouveler mon titre de séjour
+                </button>
+                <button onclick="document.getElementById('chat-input').value='Comment trouver un garant pour un logement ?'; chatForm.dispatchEvent(new Event('submit'));" class="chip bg-white border border-sage-200 text-sage-700 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 px-4 py-2 rounded-full text-sm font-medium">
+                    🔑 Trouver un garant logement
+                </button>
+                <button onclick="document.getElementById('chat-input').value='Quelles sont les démarches pour un changement de statut ?'; chatForm.dispatchEvent(new Event('submit'));" class="chip bg-white border border-sage-200 text-sage-700 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 px-4 py-2 rounded-full text-sm font-medium">
+                    💼 Changement de statut (Salarié)
+                </button>
+            </div>
         </div>
 
         <!-- History -->
         {% for message in messages %}
             {% if message.role == 'user' %}
             <div class="flex justify-end animate-fade-in-up">
-                <div class="bg-brand-600 text-white rounded-2xl rounded-tr-sm px-5 py-3 max-w-[85%] md:max-w-[70%] shadow-sm">
+                <div class="bg-brand-600 text-white rounded-[20px] rounded-tr-[4px] px-5 py-3 max-w-[85%] md:max-w-[70%] user-bubble">
                     <p class="text-sm md:text-base">{{ message.content }}</p>
                 </div>
             </div>
             {% elif message.role == 'ai' %}
             <div class="flex justify-start animate-fade-in-up">
-                <div class="flex gap-3 max-w-[85%] md:max-w-[70%]">
-                    <div class="w-8 h-8 rounded-full bg-brand-600 flex-shrink-0 flex items-center justify-center text-white text-xs mt-1 shadow-sm">☕</div>
-                    <div class="bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm prose prose-sm max-w-none ai-message-content" data-raw-content="{{ message.content }}">
+                <div class="flex gap-3 max-w-[90%] md:max-w-[80%]">
+                    <div class="w-10 h-10 rounded-xl bg-sage-700 flex-shrink-0 flex items-center justify-center text-white text-lg mt-1 shadow-sm border border-sage-800">👨‍🍳</div>
+                    <div class="bg-white border border-sage-100 text-coffee-900 rounded-[20px] rounded-tl-[4px] px-6 py-5 ai-bubble prose prose-sm max-w-none ai-message-content" data-raw-content="{{ message.content }}">
                         {{ message.content }}
                     </div>
                 </div>
@@ -70,9 +97,9 @@
         
         <!-- Typing indicator (hidden by default) -->
         <div id="typing-indicator" class="hidden flex justify-start">
-            <div class="flex gap-3">
-                <div class="w-8 h-8 rounded-full bg-brand-600 flex-shrink-0 flex items-center justify-center text-white text-xs mt-1 shadow-sm">☕</div>
-                <div class="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm flex items-center">
+            <div class="flex gap-3 max-w-[85%] md:max-w-[70%]">
+                <div class="w-10 h-10 rounded-xl bg-sage-700 flex-shrink-0 flex items-center justify-center text-white text-lg mt-1 shadow-sm border border-sage-800">👨‍🍳</div>
+                <div class="bg-white border border-sage-100 rounded-[20px] rounded-tl-[4px] px-5 py-4 ai-bubble flex items-center">
                     <div class="typing-indicator">
                         <span></span><span></span><span></span>
                     </div>
@@ -83,22 +110,35 @@
     </main>
 
     <!-- Input Area -->
-    <footer class="bg-white border-t border-gray-200 p-4">
+    <footer class="bg-coffee-50/90 backdrop-blur-md border-t border-sage-100 p-4 sticky bottom-0">
         <div class="max-w-4xl mx-auto relative">
-            <form id="chat-form" class="flex gap-2 relative">
+            
+            <!-- Language Indicator (UI Only) -->
+            <div class="absolute -top-8 right-0 text-[10px] font-bold text-sage-500 uppercase tracking-wider bg-white px-2 py-1 rounded-t-lg border border-sage-100 border-b-0">
+                <span class="mr-1">💬</span> Répond dans votre langue
+            </div>
+
+            <form id="chat-form" class="flex items-end gap-2 relative bg-white border border-sage-200 rounded-2xl p-2 shadow-sm focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-brand-500 transition-all">
                 <input type="hidden" id="conversation-id" value="{{ conversation.id }}">
+                
+                <!-- Upload button (UI Only) -->
+                <button type="button" class="p-2 text-sage-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors shrink-0" title="Joindre un document (Bientôt)">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                </button>
+
                 <textarea 
                     id="chat-input" 
                     rows="1" 
-                    class="w-full bg-gray-50 border border-gray-300 rounded-2xl pl-5 pr-14 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-700 shadow-inner"
-                    placeholder="Posez votre question ici..."
+                    class="w-full bg-transparent border-0 focus:ring-0 resize-none text-coffee-900 py-2.5 px-2 max-h-[150px]"
+                    placeholder="Tapez votre question..."
                     required
                 ></textarea>
-                <button type="submit" id="send-btn" class="absolute right-2 bottom-2 w-10 h-10 bg-brand-600 hover:bg-brand-700 text-white rounded-xl flex items-center justify-center transition-colors shadow-md">
-                    <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+
+                <button type="submit" id="send-btn" class="shrink-0 w-10 h-10 bg-brand-600 hover:bg-brand-700 text-white rounded-xl flex items-center justify-center transition-colors shadow-md disabled:opacity-50">
+                    <svg class="w-5 h-5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                 </button>
             </form>
-            <p class="text-center text-xs text-gray-400 mt-2">L'IA peut faire des erreurs. Vérifiez toujours les informations importantes sur service-public.fr.</p>
+            <p class="text-center text-[11px] text-sage-500 mt-2 font-medium">Notre Barista fait de son mieux, mais pour les infos qui comptent vraiment, on double-check ensemble sur <a href="https://www.service-public.fr" target="_blank" class="underline hover:text-brand-600">service-public.fr</a> 👌</p>
         </div>
     </footer>
 
@@ -109,11 +149,12 @@
         const typingIndicator = document.getElementById('typing-indicator');
         const conversationId = document.getElementById('conversation-id').value;
         const sendBtn = document.getElementById('send-btn');
+        const welcomeScreen = document.getElementById('welcome-screen');
 
         // Auto-resize textarea
         chatInput.addEventListener('input', function() {
             this.style.height = 'auto';
-            this.style.height = (this.scrollHeight < 120 ? this.scrollHeight : 120) + 'px';
+            this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
         });
 
         // Submit on Enter (no shift)
@@ -129,6 +170,11 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
         
+        // Hide welcome screen if there are messages
+        if (document.querySelectorAll('.ai-bubble').length > 0) {
+            if(welcomeScreen) welcomeScreen.style.display = 'none';
+        }
+
         // Parse historical messages markdown
         document.querySelectorAll('.ai-message-content').forEach(el => {
             if (el.dataset.rawContent) {
@@ -145,7 +191,7 @@
             if (role === 'user') {
                 wrapper.className = 'flex justify-end animate-fade-in-up';
                 wrapper.innerHTML = `
-                    <div class="bg-brand-600 text-white rounded-2xl rounded-tr-sm px-5 py-3 max-w-[85%] md:max-w-[70%] shadow-sm">
+                    <div class="bg-brand-600 text-white rounded-[20px] rounded-tr-[4px] px-5 py-3 max-w-[85%] md:max-w-[70%] user-bubble">
                         <p class="text-sm md:text-base">${content.replace(/\n/g, '<br>')}</p>
                     </div>
                 `;
@@ -155,9 +201,9 @@
                 let formattedContent = marked.parse(content);
                     
                 wrapper.innerHTML = `
-                    <div class="flex gap-3 max-w-[85%] md:max-w-[70%]">
-                        <div class="w-8 h-8 rounded-full bg-brand-600 flex-shrink-0 flex items-center justify-center text-white text-xs mt-1 shadow-sm">☕</div>
-                        <div class="bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm prose prose-sm max-w-none">
+                    <div class="flex gap-3 max-w-[90%] md:max-w-[80%]">
+                        <div class="w-10 h-10 rounded-xl bg-sage-700 flex-shrink-0 flex items-center justify-center text-white text-lg mt-1 shadow-sm border border-sage-800">👨‍🍳</div>
+                        <div class="bg-white border border-sage-100 text-coffee-900 rounded-[20px] rounded-tl-[4px] px-6 py-5 ai-bubble prose prose-sm max-w-none">
                             ${formattedContent}
                         </div>
                     </div>
@@ -174,6 +220,9 @@
             const content = chatInput.value.trim();
             if (!content) return;
 
+            // Hide welcome screen
+            if(welcomeScreen) welcomeScreen.style.display = 'none';
+
             // UI changes
             appendMessage('user', content);
             chatInput.value = '';
@@ -181,9 +230,8 @@
             typingIndicator.classList.remove('hidden');
             scrollToBottom();
             sendBtn.disabled = true;
-            sendBtn.classList.add('opacity-50');
 
-            // Gamification : +5 Grains de café pour avoir discuté
+            // Gamification : +5 Grains de café
             if(window.addCoffeeBeans) window.addCoffeeBeans(5);
 
             try {
@@ -202,17 +250,15 @@
                 typingIndicator.classList.add('hidden');
                 
                 if (data.status === 'success') {
-                    appendMessage('ai', data.reply);
+                    appendMessage('ai', data.message);
                 } else {
-                    appendMessage('ai', 'Une erreur est survenue: ' + data.message);
+                    appendMessage('ai', "Désolé, je rencontre un problème technique. Veuillez réessayer.");
                 }
-            } catch (err) {
+            } catch (error) {
                 typingIndicator.classList.add('hidden');
-                appendMessage('ai', 'Erreur de connexion au serveur.');
+                appendMessage('ai', "Erreur de connexion. Vérifiez votre réseau.");
             } finally {
                 sendBtn.disabled = false;
-                sendBtn.classList.remove('opacity-50');
-                chatInput.focus();
             }
         });
     </script>
