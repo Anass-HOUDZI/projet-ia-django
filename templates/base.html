@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}Café des Nations{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c', // Terracotta principal
+                            700: '#c2410c',
+                            800: '#9a3412',
+                        },
+                        duck: {
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e', // Bleu Canard principal
+                            800: '#115e59',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    {% block extra_head %}{% endblock %}
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(226, 232, 240, 0.6);
+        }
+        /* Mobile height adjustments */
+        .mobile-main {
+            height: calc(100vh - 65px - 60px); /* 100vh - header - footer */
+        }
+        @media (min-width: 768px) {
+            .mobile-main {
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#faf9f8] text-slate-800 font-sans antialiased overflow-hidden">
+    
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-white/90 backdrop-blur-md border-b border-brand-100 p-3 flex items-center justify-between z-40 relative h-[65px]">
+        <a href="/" class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-white font-bold text-sm shadow-md">☕</div>
+            <span class="font-bold text-lg text-duck-800 tracking-tight">Café des Nations</span>
+        </a>
+        
+        <!-- Mobile beans display -->
+        <div class="flex items-center gap-1 bg-brand-50 px-2 py-1 rounded-full border border-brand-100">
+            <span class="text-xs font-bold text-brand-700" id="mobile-beans-count">0</span>
+            <span class="text-xs">🫘</span>
+        </div>
+    </header>
+
+    <div class="flex h-screen">
+        <!-- Desktop Sidebar -->
+        <aside class="hidden md:flex flex-col w-64 bg-white border-r border-brand-100 h-full z-40 shadow-sm relative">
+            <div class="p-6 border-b border-brand-50 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    ☕
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-duck-800 tracking-tight leading-tight">Café des<br><span class="text-brand-600">Nations</span></h1>
+                </div>
+            </div>
+            
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl {% if request.path == '/' %}bg-brand-50 text-brand-700 font-semibold{% else %}text-slate-600 hover:bg-brand-50 hover:text-brand-800{% endif %} transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    L'Accueil
+                </a>
+                <a href="/ai/" class="flex items-center gap-3 px-4 py-3 rounded-xl {% if '/ai/' in request.path %}bg-brand-50 text-brand-700 font-semibold{% else %}text-slate-600 hover:bg-brand-50 hover:text-brand-800{% endif %} transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    Le Barista IA
+                </a>
+                <a href="/map/" class="flex items-center gap-3 px-4 py-3 rounded-xl {% if '/map/' in request.path %}bg-brand-50 text-brand-700 font-semibold{% else %}text-slate-600 hover:bg-brand-50 hover:text-brand-800{% endif %} transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Plan du Quartier
+                </a>
+                <a href="/community/" class="flex items-center gap-3 px-4 py-3 rounded-xl {% if '/community/' in request.path %}bg-brand-50 text-brand-700 font-semibold{% else %}text-slate-600 hover:bg-brand-50 hover:text-brand-800{% endif %} transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    La Grande Salle
+                </a>
+            </nav>
+            
+            <!-- Gamification Widget (Desktop) -->
+            <div class="p-6 border-t border-brand-100 bg-brand-50/50">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-duck-800 uppercase tracking-wider">Carte de Fidélité</span>
+                    <span class="text-xs font-bold text-brand-600"><span id="desktop-beans-count">0</span> 🫘</span>
+                </div>
+                <div class="w-full bg-white rounded-full h-2.5 border border-brand-100 mb-2">
+                    <div id="desktop-progress" class="bg-brand-600 h-2.5 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+                <p class="text-[11px] text-slate-500 text-center font-medium" id="desktop-rank-name">Client de passage</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col relative overflow-hidden bg-transparent mobile-main">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden glass fixed bottom-0 left-0 right-0 z-50 px-2 h-[60px] pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+        <ul class="flex justify-around items-center max-w-md mx-auto h-full">
+            <li>
+                <a href="/" class="flex flex-col items-center p-2 {% if request.path == '/' %}text-brand-600{% else %}text-slate-400{% endif %}">
+                    <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <span class="text-[10px] font-medium leading-none">Accueil</span>
+                </a>
+            </li>
+            <li>
+                <a href="/ai/" class="flex flex-col items-center p-2 {% if '/ai/' in request.path %}text-brand-600{% else %}text-slate-400{% endif %}">
+                    <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    <span class="text-[10px] font-medium leading-none">Le Barista</span>
+                </a>
+            </li>
+            <li>
+                <a href="/map/" class="flex flex-col items-center p-2 {% if '/map/' in request.path %}text-brand-600{% else %}text-slate-400{% endif %}">
+                    <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span class="text-[10px] font-medium leading-none">La Carte</span>
+                </a>
+            </li>
+            <li>
+                <a href="/community/" class="flex flex-col items-center p-2 {% if '/community/' in request.path %}text-brand-600{% else %}text-slate-400{% endif %}">
+                    <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span class="text-[10px] font-medium leading-none">Le Salon</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <!-- Gamification Engine JS -->
+    <script>
+        const RANKS = [
+            { threshold: 0, name: "Client de passage", max: 50 },
+            { threshold: 50, name: "Habitué", max: 150 },
+            { threshold: 150, name: "Local", max: 300 },
+            { threshold: 300, name: "Maire du Café", max: 300 }
+        ];
+
+        function getBeans() {
+            return parseInt(localStorage.getItem('cafe_beans') || '0');
+        }
+
+        function updateGamificationUI() {
+            const beans = getBeans();
+            
+            // Mobile Update
+            const mobEl = document.getElementById('mobile-beans-count');
+            if(mobEl) mobEl.innerText = beans;
+            
+            // Desktop Update
+            const dtEl = document.getElementById('desktop-beans-count');
+            const dtProg = document.getElementById('desktop-progress');
+            const dtRank = document.getElementById('desktop-rank-name');
+            
+            if(dtEl && dtProg && dtRank) {
+                dtEl.innerText = beans;
+                
+                // Find Rank
+                let currentRank = RANKS[0];
+                for(let r of RANKS) {
+                    if (beans >= r.threshold) {
+                        currentRank = r;
+                    }
+                }
+                
+                dtRank.innerText = currentRank.name;
+                
+                // Calculate progress %
+                let percentage = 100;
+                if (currentRank.max > currentRank.threshold) {
+                    const range = currentRank.max - currentRank.threshold;
+                    const progress = beans - currentRank.threshold;
+                    percentage = (progress / range) * 100;
+                }
+                dtProg.style.width = percentage + '%';
+            }
+        }
+
+        // Global function available to other scripts
+        window.addCoffeeBeans = function(amount) {
+            let current = getBeans();
+            localStorage.setItem('cafe_beans', current + amount);
+            updateGamificationUI();
+        }
+
+        // Init on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateGamificationUI();
+        });
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

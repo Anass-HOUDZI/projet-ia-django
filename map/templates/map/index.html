@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Le Plan du Quartier - Café des Nations{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #map { height: 100%; width: 100%; z-index: 10; } 
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!-- Map Area -->
+    <main class="flex-1 relative">
+        <div id="map" class="w-full z-10 relative"></div>
+        
+        <!-- UI Overlay -->
+        <div class="absolute top-4 right-4 z-[400] bg-white p-4 rounded-xl shadow-lg border border-gray-100 max-w-xs">
+            <h3 class="font-bold text-gray-800 mb-2">Filtres rapides</h3>
+            <div class="flex flex-col gap-2">
+                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input type="checkbox" checked class="rounded text-brand-600 focus:ring-brand-500" data-filter="Préfecture"> Préfectures
+                </label>
+                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input type="checkbox" checked class="rounded text-brand-600 focus:ring-brand-500" data-filter="CAF"> CAF
+                </label>
+                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input type="checkbox" checked class="rounded text-brand-600 focus:ring-brand-500" data-filter="Assurance Maladie"> Assurance Maladie
+                </label>
+                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input type="checkbox" checked class="rounded text-brand-600 focus:ring-brand-500" data-filter="CROUS"> CROUS
+                </label>
+                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input type="checkbox" checked class="rounded text-brand-600 focus:ring-brand-500" data-filter="Emploi"> Pôle Emploi
+                </label>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Init Leaflet map centered on Paris
+        const map = L.map('map').setView([48.8566, 2.3522], 12);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors & CARTO',
+            maxZoom: 19
+        }).addTo(map);
+
+        let markers = [];
+
+        // Fetch POIs
+        fetch('/map/api/pois/')
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    data.pois.forEach(poi => {
+                        // Custom icon color based on wait time
+                        let markerColor = poi.wait_time_minutes > 60 ? 'red' : (poi.wait_time_minutes > 30 ? 'orange' : 'green');
+                        
+                        // Circle marker
+                        const marker = L.circleMarker([poi.latitude, poi.longitude], {
+                            radius: 10,
+                            fillColor: markerColor,
+                            color: '#fff',
+                            weight: 2,
+                            opacity: 1,
+                            fillOpacity: 0.9
+                        }).addTo(map);
+
+                        // Popup content
+                        const popupContent = `
+                            <div class="font-sans">
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">${poi.name}</h4>
+                                <span class="px-2 py-0.5 bg-gray-100 text-xs rounded-full text-gray-600 mb-2 inline-block border border-gray-200">${poi.poi_type}</span>
+                                <p class="text-xs text-gray-600 mb-1"><strong>Démarches :</strong> ${poi.services_offered}</p>
+                                <p class="text-xs mt-2 flex items-center gap-1 font-semibold ${markerColor === 'red' ? 'text-red-600' : (markerColor === 'orange' ? 'text-orange-500' : 'text-green-600')}">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Attente estimée : ~${poi.wait_time_minutes} min
+                                </p>
+                            </div>
+                        `;
+                        
+                        marker.bindPopup(popupContent);
+                        
+                        // Store for filtering
+                        marker.poi_type = poi.poi_type;
+                        markers.push(marker);
+                    });
+                }
+            });
+
+        // Filtering logic
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const type = e.target.dataset.filter;
+                const isChecked = e.target.checked;
+                
+                markers.forEach(marker => {
+                    if (marker.poi_type === type) {
+                        if (isChecked) {
+                            map.addLayer(marker);
+                        } else {
+                            map.removeLayer(marker);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
