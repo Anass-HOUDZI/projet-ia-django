@@ -11,16 +11,23 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Initialize environ
+env = environ.Env()
+environ.Env.read_env(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6)wv+0&93%=zy-8=x2i6f61e@!%5(2in%ky_s^0)b=a^@r8a5m'
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-6)wv+0&93%=zy-8=x2i6f61e@!%5(2in%ky_s^0)b=a^@r8a5m')
+
+MISTRAL_API_KEY = env('MISTRAL_API_KEY', default='')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,6 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ehlo',
+    'users',
+    'map',
+    'ai',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +79,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'django_intro.wsgi.application'
+
+AUTH_USER_MODEL = 'users.CustomUser'
 
 
 # Database

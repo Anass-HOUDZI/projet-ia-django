@@ -1,0 +1,1 @@
+# Init for map app

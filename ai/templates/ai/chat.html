@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant IA - France Étrangers</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Custom scrollbar for chat area */
+        .chat-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .typing-indicator span {
+            animation: blink 1.4s infinite both;
+            height: 6px;
+            width: 6px;
+            background: #94a3b8;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 1px;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            20% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col font-sans">
+    
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                🇫🇷
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">Assistant France Étrangers</h1>
+                <p class="text-xs text-blue-600 font-medium">Propulsé par Mistral AI (Large)</p>
+            </div>
+        </div>
+        <div>
+            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span> En ligne
+            </span>
+        </div>
+    </header>
+
+    <!-- Chat Area -->
+    <main id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 chat-scroll space-y-6 flex flex-col max-w-4xl mx-auto w-full">
+        
+        <!-- Welcome Message -->
+        <div class="flex flex-col items-center justify-center my-8 text-center opacity-80">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h2 class="text-gray-700 font-semibold text-lg">Comment puis-je vous aider ?</h2>
+            <p class="text-sm text-gray-500 max-w-sm mt-2">Posez vos questions sur vos démarches administratives en France. Je réponds de façon claire et factuelle.</p>
+        </div>
+
+        <!-- History -->
+        {% for message in messages %}
+            {% if message.role == 'user' %}
+            <div class="flex justify-end animate-fade-in-up">
+                <div class="bg-blue-600 text-white rounded-2xl rounded-tr-sm px-5 py-3 max-w-[85%] md:max-w-[70%] shadow-sm">
+                    <p class="text-sm md:text-base">{{ message.content }}</p>
+                </div>
+            </div>
+            {% elif message.role == 'ai' %}
+            <div class="flex justify-start animate-fade-in-up">
+                <div class="flex gap-3 max-w-[85%] md:max-w-[70%]">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex-shrink-0 flex items-center justify-center text-white text-xs mt-1 shadow-sm">AI</div>
+                    <div class="bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm prose prose-sm max-w-none ai-message-content" data-raw-content="{{ message.content }}">
+                        {{ message.content }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+        
+        <!-- Typing indicator (hidden by default) -->
+        <div id="typing-indicator" class="hidden flex justify-start">
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex-shrink-0 flex items-center justify-center text-white text-xs mt-1 shadow-sm">AI</div>
+                <div class="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm flex items-center">
+                    <div class="typing-indicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Input Area -->
+    <footer class="bg-white border-t border-gray-200 p-4">
+        <div class="max-w-4xl mx-auto relative">
+            <form id="chat-form" class="flex gap-2 relative">
+                <input type="hidden" id="conversation-id" value="{{ conversation.id }}">
+                <textarea 
+                    id="chat-input" 
+                    rows="1" 
+                    class="w-full bg-gray-50 border border-gray-300 rounded-2xl pl-5 pr-14 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-700 shadow-inner"
+                    placeholder="Posez votre question ici..."
+                    required
+                ></textarea>
+                <button type="submit" id="send-btn" class="absolute right-2 bottom-2 w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center justify-center transition-colors shadow-md">
+                    <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </form>
+            <p class="text-center text-xs text-gray-400 mt-2">L'IA peut faire des erreurs. Vérifiez toujours les informations importantes sur service-public.fr.</p>
+        </div>
+    </footer>
+
+    <script>
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatContainer = document.getElementById('chat-container');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const conversationId = document.getElementById('conversation-id').value;
+        const sendBtn = document.getElementById('send-btn');
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight < 120 ? this.scrollHeight : 120) + 'px';
+        });
+
+        // Submit on Enter (no shift)
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Scroll to bottom
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Parse historical messages markdown
+        document.querySelectorAll('.ai-message-content').forEach(el => {
+            if (el.dataset.rawContent) {
+                el.innerHTML = marked.parse(el.dataset.rawContent);
+            }
+        });
+        
+        scrollToBottom();
+
+        // Add message to UI
+        function appendMessage(role, content) {
+            const wrapper = document.createElement('div');
+            
+            if (role === 'user') {
+                wrapper.className = 'flex justify-end animate-fade-in-up';
+                wrapper.innerHTML = `
+                    <div class="bg-blue-600 text-white rounded-2xl rounded-tr-sm px-5 py-3 max-w-[85%] md:max-w-[70%] shadow-sm">
+                        <p class="text-sm md:text-base">${content.replace(/\n/g, '<br>')}</p>
+                    </div>
+                `;
+            } else {
+                wrapper.className = 'flex justify-start animate-fade-in-up';
+                // Parsing markdown professionnel avec marked.js
+                let formattedContent = marked.parse(content);
+                    
+                wrapper.innerHTML = `
+                    <div class="flex gap-3 max-w-[85%] md:max-w-[70%]">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex-shrink-0 flex items-center justify-center text-white text-xs mt-1 shadow-sm">AI</div>
+                        <div class="bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm prose prose-sm max-w-none">
+                            ${formattedContent}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            chatContainer.insertBefore(wrapper, typingIndicator);
+            scrollToBottom();
+        }
+
+        // Handle submit
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const content = chatInput.value.trim();
+            if (!content) return;
+
+            // UI changes
+            appendMessage('user', content);
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            typingIndicator.classList.remove('hidden');
+            scrollToBottom();
+            sendBtn.disabled = true;
+            sendBtn.classList.add('opacity-50');
+
+            try {
+                const response = await fetch('/ai/api/send_message/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        conversation_id: conversationId,
+                        content: content
+                    })
+                });
+
+                const data = await response.json();
+                typingIndicator.classList.add('hidden');
+                
+                if (data.status === 'success') {
+                    appendMessage('ai', data.reply);
+                } else {
+                    appendMessage('ai', 'Une erreur est survenue: ' + data.message);
+                }
+            } catch (err) {
+                typingIndicator.classList.add('hidden');
+                appendMessage('ai', 'Erreur de connexion au serveur.');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.classList.remove('opacity-50');
+                chatInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
