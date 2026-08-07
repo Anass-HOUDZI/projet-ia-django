@@ -242,7 +242,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Onboarding Logic
             const profile = localStorage.getItem('cn_profile');
-            if (!profile) {
+            const onboardingDismissed = localStorage.getItem('cn_onboarding_dismissed');
+            if (!profile && !onboardingDismissed) {
                 setTimeout(() => {
                     document.getElementById('onboarding-modal').classList.remove('hidden');
                 }, 1500);
@@ -258,6 +259,7 @@
         };
 
         function closeOnboarding() {
+            localStorage.setItem('cn_onboarding_dismissed', 'true');
             document.getElementById('onboarding-modal').classList.add('hidden');
         }
 
@@ -295,6 +297,7 @@
             profileData.last_updated = new Date().toISOString();
             
             localStorage.setItem('cn_profile', JSON.stringify(profileData));
+            localStorage.removeItem('cn_onboarding_dismissed');
             
             // Generate tasks for Carnet based on profile
             let tasks = JSON.parse(localStorage.getItem('cn_checklist')) || [];
