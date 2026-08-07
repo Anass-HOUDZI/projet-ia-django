@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "aptitek", email = "aptitek@users.noreply.github.com" }
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dependencies = [
     "django>=6.0.7",
     "django-environ>=0.14.0",
