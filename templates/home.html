@@ -106,7 +106,7 @@
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <!-- CTA Primary -->
-                <a href="/ai/" onclick="openOnboarding(event)" class="w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl transition-all shadow-md flex items-center justify-center text-center">
+                <a href="/ai/" onclick="openHomeOnboarding(event)" class="w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl transition-all shadow-md flex items-center justify-center text-center">
                     Commander mon conseil
                 </a>
 
@@ -551,11 +551,11 @@
 </div>
 
 <!-- Onboarding Modal UI -->
-<div id="onboarding-modal" class="fixed inset-0 bg-sage-900/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform scale-95 transition-transform duration-300" id="onboarding-content">
+<div id="home-onboarding-modal" class="fixed inset-0 bg-sage-900/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform scale-95 transition-transform duration-300" id="home-onboarding-content">
         <div class="p-6 border-b border-sage-100 flex justify-between items-center bg-coffee-50">
             <h3 class="font-serif font-bold text-xl text-sage-900">Prends ta commande 📝</h3>
-            <button onclick="closeOnboarding()" class="text-sage-400 hover:text-sage-700">
+            <button onclick="closeHomeOnboarding()" class="text-sage-400 hover:text-sage-700">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
@@ -588,7 +588,7 @@
                 </div>
             </div>
 
-            <button onclick="submitOnboarding()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl shadow-md transition-colors mt-4">
+            <button onclick="submitHomeOnboarding()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl shadow-md transition-colors mt-4">
                 Commander ☕
             </button>
         </div>
@@ -596,10 +596,10 @@
 </div>
 
 <script>
-    function openOnboarding(e) {
+    function openHomeOnboarding(e) {
         if (e && e.preventDefault) e.preventDefault();
-        const modal = document.getElementById('onboarding-modal');
-        const content = document.getElementById('onboarding-content');
+        const modal = document.getElementById('home-onboarding-modal');
+        const content = document.getElementById('home-onboarding-content');
         if (modal && content) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -612,9 +612,9 @@
         }
     }
     
-    function closeOnboarding() {
-        const modal = document.getElementById('onboarding-modal');
-        const content = document.getElementById('onboarding-content');
+    function closeHomeOnboarding() {
+        const modal = document.getElementById('home-onboarding-modal');
+        const content = document.getElementById('home-onboarding-content');
         if (modal && content) {
             modal.classList.add('opacity-0');
             content.classList.add('scale-95');
@@ -625,7 +625,7 @@
         }
     }
     
-    function submitOnboarding() {
+    function submitHomeOnboarding() {
         localStorage.setItem('has_onboarded', 'true');
         window.location.href = '/ai/';
     }
