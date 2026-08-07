@@ -103,7 +103,7 @@
                                 <ul class="space-y-1 text-sage-200">
                                     <li>💬 +5 grains — question au Barista IA</li>
                                     <li>🗺️ +2 grains — exploration de la carte</li>
-                                    <li>🏛️ +2 grains — visite de la Grande Salle</li>
+                                    <li>📋 +2 grains — lecture d'un guide pratique</li>
                                     <li>✅ +3 grains — tâche cochée dans le carnet</li>
                                 </ul>
                                 <p class="mt-2 text-sage-300 text-[11px]">Les statuts Habitué, Torréfacteur et Grand Cru débloquent des avantages exclusifs.</p>
@@ -127,7 +127,7 @@
                         <div class="node-icon w-6 h-6 rounded-full bg-sage-200 border-4 border-white shadow-sm mt-1 shrink-0" id="icon-habitue"></div>
                         <div>
                             <h4 class="font-bold text-sage-900 flex items-center gap-2" id="title-habitue">Habitué (21 Grains) 🔒</h4>
-                            <p class="text-sm text-sage-600 mt-1">Débloque le badge 🏅 en Grande Salle et le salon privé.</p>
+                            <p class="text-sm text-sage-600 mt-1">Débloque le badge 🏅 et le salon privé Discord.</p>
                         </div>
                     </div>
                     
@@ -338,14 +338,14 @@
             <div class="bg-brand-50 p-4 rounded-2xl border border-brand-100 text-left mb-8">
                 <p class="text-sm font-bold text-brand-800 mb-2">Vous débloquez aujourd'hui :</p>
                 <ul class="text-sm text-brand-700 space-y-2" id="level-up-perks">
-                    <li>🏅 Un badge distinctif dans la Grande Salle</li>
+                    <li>🏅 Un badge distinctif dans votre carnet</li>
                     <li>🗣️ L'accès au salon privé sur Discord</li>
                 </ul>
             </div>
             
             <div class="flex flex-col gap-3">
                 <button onclick="document.getElementById('level-up-modal').classList.add('hidden')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">Continuer</button>
-                <button onclick="alert('Partage simulé sur Discord !')" class="w-full bg-sage-100 hover:bg-sage-200 text-sage-800 font-bold py-3 px-6 rounded-xl transition-colors">Partager en Grande Salle</button>
+                <button onclick="alert('Partage simulé sur Discord !')" class="w-full bg-sage-100 hover:bg-sage-200 text-sage-800 font-bold py-3 px-6 rounded-xl transition-colors">Partager sur Discord</button>
             </div>
         </div>
     </div>
@@ -474,7 +474,7 @@
                 if (currentTier === 'habitue') {
                     document.getElementById('level-up-name').innerText = 'Habitué';
                     document.getElementById('level-up-perks').innerHTML = `
-                        <li>🏅 Un badge distinctif dans la Grande Salle</li>
+                        <li>🏅 Un badge distinctif dans votre carnet</li>
                         <li>🗣️ L'accès au salon privé "Les Habitués" sur Discord</li>
                     `;
                 } else if (currentTier === 'torrefacteur') {
