@@ -3,9 +3,24 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
+from django.core.management import call_command
+import json
+from .models import CommunityPost, CommunityReply, CommunityCategory
 
-from .models import CommunityPost, CommunityReply
-
+def ensure_community_tables():
+    """
+    S'assure que les tables SQLite existent et sont peuplées, sinon exécute les migrations.
+    """
+    try:
+        if CommunityPost.objects.count() == 0:
+            seed_initial_community_posts()
+    except Exception as e:
+        try:
+            call_command('migrate', 'community', interactive=False)
+            if CommunityPost.objects.count() == 0:
+                seed_initial_community_posts()
+        except Exception as migrate_err:
+            print("Auto migration community error:", migrate_err)
 
 def index_view(request):
     """
@@ -23,8 +38,7 @@ def api_posts(request):
     GET: List all posts from SQLite DB.
     POST: Create a new post & bridge notification to Discord Bot Webhook.
     """
-    if CommunityPost.objects.count() == 0:
-        seed_initial_community_posts()
+    ensure_community_tables()
 
     if request.method == 'GET':
         posts = CommunityPost.objects.all().prefetch_related('replies')
@@ -63,6 +77,7 @@ def api_posts(request):
             if not title or not content:
                 return JsonResponse({'status': 'error', 'message': 'Titre et contenu obligatoires'}, status=400)
 
+            # Creating CommunityPost fires Django post_save signal auto_notify_discord_on_create!
             post = CommunityPost.objects.create(
                 title=title,
                 content=content,
@@ -72,18 +87,71 @@ def api_posts(request):
                 author_avatar="☕"
             )
 
-            # Bot Discord Notification Bridge
-            discord_sent = post.notify_discord_bot()
-
             return JsonResponse({
                 'status': 'success',
                 'post_id': post.id,
-                'sent_to_discord': discord_sent,
-                'message': 'Question publiée en Grande Salle et transmise au Bot Discord !'
+                'sent_to_discord': post.sent_to_discord,
+                'message': 'Question publiée en Grande Salle et synchronisée automatiquement sur Discord !'
             })
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@csrf_exempt
+def api_discord_incoming_webhook(request):
+    """
+    Endpoint bidirectionnel Discord -> Site : Reçoit les messages postés sur Discord et les publie en Grande Salle.
+    """
+    ensure_community_tables()
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+            content = body.get('content') or body.get('message') or body.get('title')
+            username = body.get('username') or (body.get('author', {}).get('username') if isinstance(body.get('author'), dict) else 'Membre Discord')
+            
+            if not content:
+                return JsonResponse({'status': 'ignored', 'message': 'Contenu vide'}, status=200)
+
+            # Prevent loops if message came from our own bot
+            if 'Barista Discord Bot' in str(username):
+                return JsonResponse({'status': 'ignored', 'message': 'Bot message ignored'}, status=200)
+
+            title = content[:80] + ("..." if len(content) > 80 else "")
+
+            # Create post with sent_to_discord=True to prevent loopback
+            post = CommunityPost.objects.create(
+                title=title,
+                content=content,
+                category_slug='demarches',
+                author_name=f"{username} (Discord)",
+                author_role="Discord Community",
+                author_avatar="🤖",
+                sent_to_discord=True
+            )
+
+            return JsonResponse({
+                'status': 'success',
+                'post_id': post.id,
+                'message': 'Message Discord publié automatiquement dans la Grande Salle !'
+            })
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée'}, status=405)
+
+@csrf_exempt
+def api_sync_discord(request):
+    """
+    Synchronise les questions non encore transmises avec le serveur Discord.
+    """
+    ensure_community_tables()
+    posts = CommunityPost.objects.filter(sent_to_discord=False)
+    count = 0
+    for p in posts:
+        if p.notify_discord_bot():
+            count += 1
+    return JsonResponse({'status': 'success', 'synced_count': count, 'message': f'{count} question(s) transmise(s) à Discord !'})
 
 @csrf_exempt
 def api_like_post(request, post_id):

@@ -1,5 +1,10 @@
+from django.db import models
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import json
 import urllib.request
+import ssl
 
 from django.conf import settings
 from django.db import models
@@ -35,11 +40,11 @@ class CommunityPost(models.Model):
 
     def notify_discord_bot(self):
         """
-        Bridge Bot Discord : Envoie une notification formatée (Embed) au serveur Discord (via urllib.request).
+        Bridge Bot Discord : Envoie une notification instantanée au serveur Discord via Webhook.
         """
         webhook_url = getattr(settings, 'DISCORD_WEBHOOK_URL', '')
         if not webhook_url or 'dummy' in webhook_url:
-            print(f"[Discord Bot] Question enregistrée en BDD : '{self.title}' (Prêt pour webhook Discord)")
+            print(f"[Discord Bot Warning] Webhook URL absente ou dummy : '{self.title}'")
             return False
 
         embed = {
@@ -65,20 +70,22 @@ class CommunityPost(models.Model):
         }
 
         payload = json.dumps({
-            "username": "Le Barista Discord Bot ☕",
-            "embeds": [embed]
+            "username": "Le Barista",
+            "content": text_message
         }).encode('utf-8')
 
         try:
+            context = ssl._create_unverified_context()
             req = urllib.request.Request(
                 webhook_url,
                 data=payload,
                 headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'}
             )
-            with urllib.request.urlopen(req, timeout=4) as response:
+            with urllib.request.urlopen(req, context=context, timeout=8) as response:
+                print(f"[Discord Bot Success] Webhook response status: {response.status} pour '{self.title}'")
                 if response.status in [200, 204]:
                     self.sent_to_discord = True
-                    self.save(update_fields=['sent_to_discord'])
+                    CommunityPost.objects.filter(id=self.id).update(sent_to_discord=True)
                     return True
         except Exception as e:
             print("[Discord Bot Error]:", e)
@@ -95,3 +102,11 @@ class CommunityReply(models.Model):
 
     def __str__(self):
         return f"Réponse à {self.post.title} par {self.author_name}"
+
+@receiver(post_save, sender=CommunityPost)
+def auto_notify_discord_on_create(sender, instance, created, **kwargs):
+    """
+    Signal automatique : Déclenche la synchronisation Discord instantanée dès la création d'une question.
+    """
+    if created and not instance.sent_to_discord:
+        instance.notify_discord_bot()
