@@ -36,39 +36,25 @@ class CommunityPost(models.Model):
 
     def notify_discord_bot(self):
         """
-        Bridge Bot Discord : Envoie une notification formatée (Embed) au serveur Discord via Webhook.
+        Bridge Bot Discord : Envoie une notification instantanée au serveur Discord via Webhook.
         """
         webhook_url = getattr(settings, 'DISCORD_WEBHOOK_URL', '')
         if not webhook_url or 'dummy' in webhook_url:
             print(f"[Discord Bot Warning] Webhook URL absente ou dummy : '{self.title}'")
             return False
 
-        embed = {
-            "title": f"📢 NOUVELLE QUESTION EN GRANDE SALLE : {self.title}",
-            "description": self.content[:350] + ("..." if len(self.content) > 350 else ""),
-            "url": "https://cafedesnations.fr/community/",
-            "color": 15230000, # Terracotta #E8622C
-            "fields": [
-                {
-                    "name": "Catégorie",
-                    "value": str(self.category_slug).upper(),
-                    "inline": True
-                },
-                {
-                    "name": "Auteur",
-                    "value": f"{self.author_avatar} {self.author_name} ({self.author_role})",
-                    "inline": True
-                }
-            ],
-            "footer": {
-                "text": "Café des Nations • Bot Discord d'Entraide 🤖",
-            }
-        }
+        category_name = str(self.category_slug).upper()
+        text_message = (
+            f"☕ **[GRANDE SALLE - {category_name}]**\n"
+            f"👤 **Auteur:** {self.author_name} ({self.author_role})\n"
+            f"📌 **Titre:** {self.title}\n"
+            f"💬 **Question:**\n> {self.content}\n\n"
+            f"👉 *Rejoindre et répondre : https://cafedesnations.fr/community/*"
+        )
         
         payload = json.dumps({
-            "content": f"☕ **Nouvelle question posée par {self.author_name} en Grande Salle !**",
-            "username": "Le Barista Discord Bot ☕",
-            "embeds": [embed]
+            "username": "Le Barista",
+            "content": text_message
         }).encode('utf-8')
         
         try:
@@ -78,7 +64,7 @@ class CommunityPost(models.Model):
                 data=payload,
                 headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'}
             )
-            with urllib.request.urlopen(req, context=context, timeout=6) as response:
+            with urllib.request.urlopen(req, context=context, timeout=8) as response:
                 print(f"[Discord Bot Success] Webhook response status: {response.status} pour '{self.title}'")
                 if response.status in [200, 204]:
                     self.sent_to_discord = True
@@ -103,7 +89,7 @@ class CommunityReply(models.Model):
 @receiver(post_save, sender=CommunityPost)
 def auto_notify_discord_on_create(sender, instance, created, **kwargs):
     """
-    Signal automatique : Déclenche la synchronisation Discord instantanée dès création d'une question.
+    Signal automatique : Déclenche la synchronisation Discord instantanée dès la création d'une question.
     """
     if created and not instance.sent_to_discord:
         instance.notify_discord_bot()
