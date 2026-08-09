@@ -340,32 +340,33 @@
         }
     ];
 
+    let allPosts = [];
     let currentCategory = 'all';
 
     document.addEventListener('DOMContentLoaded', () => {
-        renderPosts();
+        loadPostsFromDB();
     });
 
-    function getPosts() {
-        const stored = localStorage.getItem('cn_community_posts');
-        if (stored) {
-            try {
-                const userPosts = JSON.parse(stored);
-                return [...userPosts, ...DEFAULT_POSTS];
-            } catch(e) {
-                return DEFAULT_POSTS;
-            }
-        }
-        return DEFAULT_POSTS;
+    function loadPostsFromDB() {
+        fetch('/community/api/posts/')
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success' && data.posts) {
+                    allPosts = data.posts;
+                    renderPosts();
+                }
+            })
+            .catch(err => {
+                console.error("Erreur chargement posts DB:", err);
+            });
     }
 
     function renderPosts() {
         const feed = document.getElementById('postsFeed');
-        const posts = getPosts();
         const searchTerm = document.getElementById('postSearch').value.toLowerCase();
 
-        const filtered = posts.filter(post => {
-            const matchCat = (currentCategory === 'all') || (post.category === currentCategory);
+        const filtered = allPosts.filter(post => {
+            const matchCat = (currentCategory === 'all') || (post.category_slug === currentCategory);
             const matchSearch = post.title.toLowerCase().includes(searchTerm) || post.content.toLowerCase().includes(searchTerm);
             return matchCat && matchSearch;
         });
@@ -374,28 +375,45 @@
             feed.innerHTML = `
                 <div class="bg-white rounded-2xl border border-sage-100 p-8 text-center">
                     <span class="text-4xl">🔍</span>
-                    <h4 class="font-bold text-sage-900 mt-2">Aucune discussion trouvée</h4>
-                    <p class="text-xs text-sage-600 mt-1 mb-4">Soyez le premier à poser une question dans cette catégorie !</p>
+                    <h4 class="font-bold text-sage-900 mt-2">Aucune discussion trouvée dans la Base de Données</h4>
+                    <p class="text-xs text-sage-600 mt-1 mb-4">Soyez le premier à poser une question et diffuser sur le serveur Discord !</p>
                     <button onclick="openNewPostModal()" class="px-4 py-2 bg-brand-600 text-white font-bold rounded-xl text-xs">Poser une question</button>
                 </div>
             `;
             return;
         }
 
+        const categoryLabels = {
+            demarches: '📄 Démarches',
+            logement: '🏠 Logement',
+            emploi: '💼 Emploi',
+            etudiant: '🎓 Étudiant',
+            bons_plans: '💡 Bons plans'
+        };
+
         let html = '';
         filtered.forEach(post => {
+            const avatar = post.author_avatar && post.author_avatar.length === 1 
+                ? `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author_name)}&background=E8622C&color=fff`
+                : post.author_avatar;
+
             html += `
                 <div class="post-card bg-white p-5 md:p-6 rounded-3xl border border-sage-100 shadow-sm space-y-4">
                     <!-- Post Header -->
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex items-center gap-3">
-                            <img class="w-10 h-10 rounded-full border border-sage-100 shadow-xs" src="${post.avatar}" alt="${post.author}">
+                            <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-lg">
+                                ${post.author_avatar || '☕'}
+                            </div>
                             <div>
-                                <h4 class="text-xs font-bold text-sage-900">${post.author}</h4>
-                                <span class="text-[10px] text-sage-500 font-medium">${post.date}</span>
+                                <h4 class="text-xs font-bold text-sage-900">${escapeHtml(post.author_name)}</h4>
+                                <span class="text-[10px] text-sage-500 font-medium">${post.created_at}</span>
                             </div>
                         </div>
-                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-coffee-50 text-sage-700 border border-sage-100">${post.categoryLabel || 'Démarches'}</span>
+                        <div class="flex items-center gap-2">
+                            ${post.sent_to_discord ? `<span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">🤖 Bot Discord</span>` : ''}
+                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-coffee-50 text-sage-700 border border-sage-100">${categoryLabels[post.category_slug] || 'Démarches'}</span>
+                        </div>
                     </div>
 
                     <!-- Post Title & Content -->
@@ -409,24 +427,24 @@
                         <div class="flex items-center gap-4">
                             <button onclick="likePost(${post.id})" class="flex items-center gap-1.5 text-sage-600 hover:text-brand-600 transition-colors font-medium">
                                 <span>☕ Utile</span>
-                                <span id="like-count-${post.id}" class="font-bold text-sage-900 bg-sage-100 px-2 py-0.5 rounded-full text-[11px]">${post.likes}</span>
+                                <span id="like-count-${post.id}" class="font-bold text-sage-900 bg-sage-100 px-2 py-0.5 rounded-full text-[11px]">${post.likes_count}</span>
                             </button>
                             <span class="text-sage-300">•</span>
-                            <span class="text-sage-600 font-medium">${post.replies.length} réponse${post.replies.length > 1 ? 's' : ''}</span>
+                            <span class="text-sage-600 font-medium">${post.replies ? post.replies.length : 0} réponse${(post.replies && post.replies.length > 1) ? 's' : ''}</span>
                         </div>
                         <button onclick="toggleReplies(${post.id})" class="text-brand-600 font-bold hover:text-brand-700 text-xs flex items-center gap-1">
-                            Voir les réponses (${post.replies.length})
+                            Voir les réponses (${post.replies ? post.replies.length : 0})
                         </button>
                     </div>
 
-                    <!-- Replies Section (hidden by default unless expanded or HAS barista reply) -->
+                    <!-- Replies Section -->
                     <div id="replies-${post.id}" class="hidden space-y-3 pt-3 border-t border-sage-100 bg-coffee-50/50 p-4 rounded-2xl">
-                        ${post.replies.map(r => `
+                        ${(post.replies || []).map(r => `
                             <div class="bg-white p-3 rounded-xl border border-sage-100 text-xs space-y-1">
                                 <div class="flex items-center justify-between">
                                     <span class="font-bold text-sage-900 flex items-center gap-1.5">
-                                        ${r.author}
-                                        ${r.badge ? `<span class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-brand-100 text-brand-700 uppercase">${r.badge}</span>` : ''}
+                                        ${r.author_avatar || '☕'} ${escapeHtml(r.author_name)}
+                                        ${r.is_official_answer ? `<span class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-brand-100 text-brand-700 uppercase">Officiel</span>` : ''}
                                     </span>
                                 </div>
                                 <p class="text-coffee-800 text-xs leading-relaxed">${escapeHtml(r.content)}</p>
@@ -449,7 +467,8 @@
     function filterPosts(cat) {
         currentCategory = cat;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`tab-${cat}`).classList.add('active');
+        const activeTab = document.getElementById(`tab-${cat}`);
+        if (activeTab) activeTab.classList.add('active');
         renderPosts();
     }
 
@@ -463,14 +482,14 @@
     }
 
     function likePost(id) {
-        const countEl = document.getElementById(`like-count-${id}`);
-        if (countEl) {
-            let val = parseInt(countEl.innerText) || 0;
-            countEl.innerText = val + 1;
-            // Award beans logic simulation
-            let beans = parseInt(localStorage.getItem('cn_beans')) || 100;
-            localStorage.setItem('cn_beans', beans + 5);
-        }
+        fetch(`/community/api/posts/${id}/like/`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const countEl = document.getElementById(`like-count-${id}`);
+                    if (countEl) countEl.innerText = data.likes_count;
+                }
+            });
     }
 
     function openNewPostModal() {
@@ -483,54 +502,33 @@
 
     function submitNewPost(e) {
         e.preventDefault();
-        const author = document.getElementById('post-author').value.trim();
+        const author = document.getElementById('post-author').value.trim() || 'Habitué';
         const category = document.getElementById('post-category').value;
         const title = document.getElementById('post-title').value.trim();
         const content = document.getElementById('post-content').value.trim();
 
-        const categoryLabels = {
-            demarches: '📄 Démarches',
-            logement: '🏠 Logement',
-            emploi: '💼 Emploi',
-            etudiant: '🎓 Étudiant',
-            bons_plans: '💡 Bons plans'
-        };
+        if (!title || !content) return;
 
-        const newPost = {
-            id: Date.now(),
-            author: author || "Habitué",
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(author)}&background=E8622C&color=fff`,
-            category: category,
-            categoryLabel: categoryLabels[category] || 'Démarches',
-            title: title,
-            content: content,
-            date: "À l'instant",
-            likes: 1,
-            replies: [
-                {
-                    author: "Barista IA ☕",
-                    badge: "IA Officielle",
-                    content: "Merci pour votre question ! Le Barista analyse les éléments de votre demande pour vous répondre dans quelques instants."
-                }
-            ]
-        };
-
-        let userPosts = [];
-        try {
-            userPosts = JSON.parse(localStorage.getItem('cn_community_posts')) || [];
-        } catch(err) {
-            userPosts = [];
-        }
-        userPosts.unshift(newPost);
-        localStorage.setItem('cn_community_posts', JSON.stringify(userPosts));
-
-        // Reset form & close
-        document.getElementById('post-title').value = '';
-        document.getElementById('post-content').value = '';
-        closeNewPostModal();
-
-        // Re-render feed
-        renderPosts();
+        fetch('/community/api/posts/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: title,
+                content: content,
+                category_slug: category,
+                author_name: author
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('post-title').value = '';
+                document.getElementById('post-content').value = '';
+                closeNewPostModal();
+                loadPostsFromDB();
+            }
+        })
+        .catch(err => console.error(err));
     }
 
     function addReply(postId) {
@@ -538,33 +536,29 @@
         if (!input || !input.value.trim()) return;
 
         const replyText = input.value.trim();
-        let userPosts = [];
-        try {
-            userPosts = JSON.parse(localStorage.getItem('cn_community_posts')) || [];
-        } catch(err) {}
-
-        // Check default posts or user posts
-        const posts = getPosts();
-        const target = posts.find(p => p.id === postId);
-        if (target) {
-            target.replies.push({
-                author: "Vous ☕",
-                badge: "Moi",
-                content: replyText
-            });
-            localStorage.setItem('cn_community_posts', JSON.stringify(userPosts.concat([target])));
-        }
-
-        input.value = '';
-        renderPosts();
-        // Keep replies open
-        setTimeout(() => {
-            const el = document.getElementById(`replies-${postId}`);
-            if(el) el.classList.remove('hidden');
-        }, 50);
+        fetch(`/community/api/posts/${postId}/reply/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: replyText,
+                author_name: 'Habitué'
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                input.value = '';
+                loadPostsFromDB();
+                setTimeout(() => {
+                    const el = document.getElementById(`replies-${postId}`);
+                    if(el) el.classList.remove('hidden');
+                }, 100);
+            }
+        });
     }
 
     function escapeHtml(str) {
+        if (!str) return '';
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 </script>
