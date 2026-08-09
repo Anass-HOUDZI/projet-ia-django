@@ -1,3 +1,6 @@
+import json
+import urllib.request
+
 from django.conf import settings
 from django.db import models
 
@@ -60,12 +63,12 @@ class CommunityPost(models.Model):
                 "text": "Café des Nations • Bot Discord d'Entraide 🤖",
             }
         }
-        
+
         payload = json.dumps({
             "username": "Le Barista Discord Bot ☕",
             "embeds": [embed]
         }).encode('utf-8')
-        
+
         try:
             req = urllib.request.Request(
                 webhook_url,
