@@ -1,6 +1,12 @@
+import re
+
 import openai
 from django.conf import settings
 from .models import Message
+
+# Matches the hidden context injected by the frontend, e.g.
+# [CONTEXTE SYSTÈME INVISIBLE: L'utilisateur est originaire de ...]
+HIDDEN_CONTEXT_RE = re.compile(r'\[CONTEXTE SYSTÈME INVISIBLE:[^\]]*\]', re.DOTALL)
 
 class ChatbotService:
     def __init__(self):
@@ -88,3 +94,57 @@ class ChatbotService:
                 content=error_msg
             )
             return f"Désolé, je rencontre un problème technique. Voici l'erreur exacte pour le développeur : {str(e)}"
+
+    def summarize_conversation(self, messages):
+        """
+        Demande à l'IA de résumer la conversation sous forme structurée en 5 sections.
+        messages: queryset ou liste de Message (role != 'system').
+        Retourne le texte du résumé (str) ou None en cas d'erreur.
+        """
+        transcript_lines = []
+        for msg in messages:
+            clean = HIDDEN_CONTEXT_RE.sub('', msg.content).strip()
+            if not clean:
+                continue
+            if msg.role == 'user':
+                transcript_lines.append(f"UTILISATEUR : {clean}")
+            elif msg.role == 'ai':
+                transcript_lines.append(f"BARISTA : {clean}")
+
+        if not transcript_lines:
+            return None
+
+        transcript = "\n\n".join(transcript_lines)
+
+        summary_system_prompt = (
+            "Tu es un assistant administratif expert. "
+            "À partir de la conversation fournie entre un utilisateur et le Barista IA du Café des Nations, "
+            "génère un résumé structuré en français avec exactement les 5 sections suivantes, dans cet ordre, et rien d'autre :\n\n"
+            "## Résumé de la demande\n"
+            "[1 à 3 phrases résumant la situation et la demande de l'utilisateur]\n\n"
+            "## Démarches à effectuer\n"
+            "- [démarche 1]\n"
+            "- [démarche 2]\n\n"
+            "## Documents nécessaires\n"
+            "- [document 1]\n"
+            "- [document 2]\n\n"
+            "## Échéances et délais\n"
+            "- [délai ou échéance] (si rien de mentionné, écrire « Aucun délai mentionné »)\n\n"
+            "## Organismes et liens utiles\n"
+            "- [organisme ou lien] (si rien de mentionné, écrire « Aucun mentionné »)\n\n"
+            "Réponds UNIQUEMENT avec ces 5 sections. Pas d'introduction. Pas de conclusion. Pas de blabla."
+        )
+
+        try:
+            response = self.client.chat.completions.create(
+                model="mistral-large-latest",
+                messages=[
+                    {"role": "system", "content": summary_system_prompt},
+                    {"role": "user", "content": f"Voici la conversation à résumer :\n\n{transcript}"},
+                ],
+                temperature=0.2,
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            print(f"[PDF Export] Erreur résumé IA : {e}")
+            return None
