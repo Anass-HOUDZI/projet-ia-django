@@ -131,40 +131,53 @@ class CommunityReply(models.Model):
             print("[Discord Reply Bot Error]:", e)
         return False
 
+import threading
+
 @receiver(post_save, sender=CommunityPost)
 def auto_notify_discord_on_create(sender, instance, created, **kwargs):
     """
-    Signal automatique :
+    Signal automatique non-bloquant (Thread d'arrière-plan) :
     1. Envoie la question sur Discord.
     2. Génère une réponse IA automatique via Mistral.
     3. Publie la réponse IA sur le site et l'envoie sur Discord.
     """
     if created:
-        if not instance.sent_to_discord:
-            instance.notify_discord_bot()
-        
-        # Generer automatiquement une réponse IA Mistral pour la question
-        try:
-            from ai.services import ChatbotService
-            service = ChatbotService()
-            ai_text = service.generate_community_answer(instance.title, instance.content)
-            
-            # Sauvegarder la réponse IA (qui déclenchera son propre signal Discord)
-            CommunityReply.objects.create(
-                post=instance,
-                author_name="Le Barista IA",
-                author_role="Assistant IA Officiel",
-                author_avatar="👨‍🍳",
-                content=ai_text,
-                is_official_answer=True
-            )
-        except Exception as e:
-            print("Error auto-generating Mistral AI reply:", e)
+        def process_post_async(post_id):
+            try:
+                post = CommunityPost.objects.get(id=post_id)
+                if not post.sent_to_discord:
+                    post.notify_discord_bot()
+                
+                # Générer automatiquement une réponse IA Mistral pour la question
+                from ai.services import ChatbotService
+                service = ChatbotService()
+                ai_text = service.generate_community_answer(post.title, post.content)
+                
+                # Sauvegarder la réponse IA (qui déclenchera son propre signal Discord)
+                CommunityReply.objects.create(
+                    post=post,
+                    author_name="Le Barista IA",
+                    author_role="Assistant IA Officiel",
+                    author_avatar="👨‍🍳",
+                    content=ai_text,
+                    is_official_answer=True
+                )
+            except Exception as e:
+                print("Error in background post processing:", e)
+
+        threading.Thread(target=process_post_async, args=(instance.id,), daemon=True).start()
 
 @receiver(post_save, sender=CommunityReply)
 def auto_notify_discord_on_reply(sender, instance, created, **kwargs):
     """
-    Signal automatique : Transmet les nouvelles réponses (utilisateurs ou IA) vers Discord.
+    Signal automatique non-bloquant : Transmet les nouvelles réponses (utilisateurs ou IA) vers Discord.
     """
     if created and not instance.sent_to_discord:
-        instance.notify_discord_bot()
+        def process_reply_async(reply_id):
+            try:
+                reply = CommunityReply.objects.get(id=reply_id)
+                reply.notify_discord_bot()
+            except Exception as e:
+                print("Error in background reply processing:", e)
+
+        threading.Thread(target=process_reply_async, args=(instance.id,), daemon=True).start()

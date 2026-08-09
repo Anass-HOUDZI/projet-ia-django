@@ -265,7 +265,7 @@
 
             <div class="flex justify-end gap-3 pt-2">
                 <button type="button" onclick="closeNewPostModal()" class="px-5 py-2.5 rounded-xl border border-sage-200 text-sage-600 text-xs font-bold hover:bg-sage-50">Annuler</button>
-                <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-colors shadow-md">Publier ma question</button>
+                <button type="submit" id="submit-post-btn" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-colors shadow-md">Publier ma question</button>
             </div>
         </form>
     </div>
@@ -509,12 +509,18 @@
 
     function submitNewPost(e) {
         e.preventDefault();
+        const btn = document.getElementById('submit-post-btn');
         const author = document.getElementById('post-author').value.trim() || 'Habitué';
         const category = document.getElementById('post-category').value;
         const title = document.getElementById('post-title').value.trim();
         const content = document.getElementById('post-content').value.trim();
 
         if (!title || !content) return;
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "⌛ Publication...";
+        }
 
         fetch('/community/api/posts/', {
             method: 'POST',
@@ -534,8 +540,18 @@
                 closeNewPostModal();
                 loadPostsFromDB();
             }
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Publier ma question";
+            }
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+            console.error(err);
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Publier ma question";
+            }
+        });
     }
 
     function addReply(postId) {
