@@ -1,11 +1,13 @@
 from django.test import TestCase
+from django.contrib.auth import get_user_model
 from unittest.mock import patch, MagicMock
 from ai.models import Conversation, Message
 from ai.services import ChatbotService
 
 class ChatbotServiceTest(TestCase):
     def setUp(self):
-        self.conversation = Conversation.objects.create(session_key="test_session")
+        self.user = get_user_model().objects.create_user(username="chat-user", password="test-password")
+        self.conversation = Conversation.objects.create(user=self.user, title="Conversation de test")
         Message.objects.create(conversation=self.conversation, role="user", content="Bonjour")
 
     @patch("ai.services.openai.OpenAI")

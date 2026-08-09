@@ -8,7 +8,7 @@ class EhloViewsTests(TestCase):
         self.client = Client()
         self.User = get_user_model()
         self.user = self.User.objects.create_user(username='testuser', password='password123')
-        self.conversation = Conversation.objects.create(user=self.user, session_key='test_session')
+        self.conversation = Conversation.objects.create(user=self.user, title='Conversation de test')
 
     def test_index_view(self):
         url = reverse('ehlo')
