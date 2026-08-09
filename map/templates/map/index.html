@@ -125,6 +125,23 @@
                     <button data-type="OFPRA" class="filter-chip shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300">⚖️ OFPRA & Asile</button>
                     <button data-type="CAF" class="filter-chip shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300">🏠 CAF & Visale</button>
                     <button data-type="Assurance Maladie" class="filter-chip shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300">🏥 CPAM / Santé</button>
+                    <button data-type="CROUS" class="filter-chip shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300">🏢 CROUS</button>
+                </div>
+
+                <!-- Secondary Filters: City & Wait Time -->
+                <div class="flex items-center gap-1.5 flex-wrap py-0.5" id="advanced-filters-container">
+                    <select id="filter-city" class="shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1.5 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer">
+                        <option value="">🏙️ Toutes les villes</option>
+                    </select>
+                    <select id="filter-wait" class="shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-800 px-3 py-1.5 rounded-full text-xs font-bold shadow-2xs hover:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-300 cursor-pointer">
+                        <option value="">⏳ Attente : peu importe</option>
+                        <option value="15">⏳ Moins de 15 min</option>
+                        <option value="30">⏳ Moins de 30 min</option>
+                        <option value="60">⏳ Moins de 60 min</option>
+                    </select>
+                    <button id="btn-reset-filters" class="shrink-0 bg-white/90 backdrop-blur border border-sage-200 text-sage-500 hover:text-brand-600 hover:border-brand-300 px-3 py-1.5 rounded-full text-xs font-bold shadow-2xs transition-colors">
+                        ✕ Réinitialiser
+                    </button>
                 </div>
 
                 <!-- Geolocate button -->
@@ -243,6 +260,8 @@
         let markersLayer = L.layerGroup().addTo(map);
         let activeFilter = null;
         let activeSearch = '';
+        let activeCity = '';
+        let activeMaxWait = null;
         let isLocating = false;
 
         const poiPanel = document.getElementById('poi-detail');
@@ -342,7 +361,13 @@
 
                 // Filter type
                 if (activeFilter && poi.poi_type !== activeFilter) return;
-                
+
+                // Filter city
+                if (activeCity && poi.city !== activeCity) return;
+
+                // Filter max wait time
+                if (activeMaxWait !== null && poi.wait_time_minutes >= activeMaxWait) return;
+
                 // Search term
                 if (activeSearch) {
                     const term = activeSearch.toLowerCase();
@@ -424,12 +449,21 @@
 
         document.getElementById('btn-locate').addEventListener('click', locateUser);
 
+        // Populate the city dropdown from the POIs actually loaded (no extra API call)
+        function populateCityFilter() {
+            const citySelect = document.getElementById('filter-city');
+            const cities = [...new Set(allPois.map(p => p.city).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'));
+            citySelect.innerHTML = '<option value="">🏙️ Toutes les villes</option>' +
+                cities.map(city => `<option value="${city}">${city}</option>`).join('');
+        }
+
         // Fetch POIs from API
         fetch('/map/api/pois/')
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success' && data.pois) {
                     allPois = data.pois;
+                    populateCityFilter();
                     renderMap();
                 }
             })
@@ -458,6 +492,34 @@
                 isLocating = false;
                 renderMap();
             });
+        });
+
+        // City Filter Listener
+        document.getElementById('filter-city').addEventListener('change', (e) => {
+            activeCity = e.target.value;
+            isLocating = false;
+            renderMap();
+        });
+
+        // Max Wait Time Filter Listener
+        document.getElementById('filter-wait').addEventListener('change', (e) => {
+            activeMaxWait = e.target.value ? parseInt(e.target.value, 10) : null;
+            isLocating = false;
+            renderMap();
+        });
+
+        // Reset All Filters
+        document.getElementById('btn-reset-filters').addEventListener('click', () => {
+            activeFilter = null;
+            activeSearch = '';
+            activeCity = '';
+            activeMaxWait = null;
+            isLocating = false;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            document.getElementById('filter-city').value = '';
+            document.getElementById('filter-wait').value = '';
+            document.getElementById('search-input').value = '';
+            renderMap();
         });
     </script>
 {% endblock %}
