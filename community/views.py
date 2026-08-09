@@ -1,11 +1,11 @@
 import json
 
+from django.core.management import call_command
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
-from django.core.management import call_command
-import json
-from .models import CommunityPost, CommunityReply, CommunityCategory
+
+from .models import CommunityPost, CommunityReply
 
 def ensure_community_tables():
     """
@@ -26,10 +26,12 @@ def index_view(request):
     """
     Renders the community landing page with database posts & Discord bot integration.
     """
-    if CommunityPost.objects.count() == 0:
-        seed_initial_community_posts()
-
-    posts = CommunityPost.objects.all().prefetch_related('replies')
+    try:
+        ensure_community_tables()
+        posts = CommunityPost.objects.all().prefetch_related('replies')
+    except Exception as e:
+        print("Index view database recovery:", e)
+        posts = []
     return render(request, 'community/index.html', {'db_posts': posts})
 
 @csrf_exempt

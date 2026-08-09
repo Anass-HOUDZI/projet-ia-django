@@ -49,6 +49,7 @@ class Migration(migrations.Migration):
                 ('content', models.TextField()),
                 ('is_official_answer', models.BooleanField(default=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('sent_to_discord', models.BooleanField(default=False)),
                 ('post', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='replies', to='community.communitypost')),
             ],
         ),
