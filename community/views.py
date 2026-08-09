@@ -1,5 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+import json
+
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 from django.core.management import call_command
 import json
@@ -24,7 +26,9 @@ def index_view(request):
     """
     Renders the community landing page with database posts & Discord bot integration.
     """
-    ensure_community_tables()
+    if CommunityPost.objects.count() == 0:
+        seed_initial_community_posts()
+
     posts = CommunityPost.objects.all().prefetch_related('replies')
     return render(request, 'community/index.html', {'db_posts': posts})
 
@@ -69,7 +73,7 @@ def api_posts(request):
             content = body.get('content')
             category_slug = body.get('category_slug', 'demarches')
             author_name = body.get('author_name', 'Habitué')
-            
+
             if not title or not content:
                 return JsonResponse({'status': 'error', 'message': 'Titre et contenu obligatoires'}, status=400)
 
@@ -166,7 +170,7 @@ def api_add_reply(request, post_id):
             body = json.loads(request.body)
             content = body.get('content')
             author_name = body.get('author_name', 'Habitué')
-            
+
             if not content:
                 return JsonResponse({'status': 'error', 'message': 'Contenu vide'}, status=400)
 

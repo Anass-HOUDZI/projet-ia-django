@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class AdministrativePOI(models.Model):
     name = models.CharField(max_length=255)
     poi_type = models.CharField(max_length=100) # e.g., CAF, CPAM, Préfecture

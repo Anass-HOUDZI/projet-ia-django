@@ -1,12 +1,3 @@
-[tool.ruff]
-# Enable rules for Pyflakes (F) and pycodestyle (E)
-select = ["E", "F", "W", "I", "N", "B", "UP", "C4", "SIM", "DJ"]
-ignore = ["E501"] # Ignore line length violations
-
-# Allow autofix for all enabled rules
-fixable = ["ALL"]
-unfixable = []
-
 # Exclude a variety of commonly ignored directories.
 exclude = [
     ".bzr",
@@ -33,7 +24,14 @@ exclude = [
     "migrations",
 ]
 line-length = 88
-target-version = "py313"
+target-version = "py312"
 
-[tool.ruff.mccobe]
+[lint]
+# Enable rules for Pyflakes (F) and pycodestyle (E).
+select = ["E", "F", "W", "I", "N", "B", "UP", "C4", "SIM", "DJ"]
+ignore = ["E501", "DJ001"]
+fixable = ["ALL"]
+unfixable = []
+
+[lint.mccabe]
 max-complexity = 10

@@ -8,7 +8,7 @@ Assistant administratif 100% piloté par l'IA pour centraliser et automatiser le
 * **Anass**
 
 ## 🛠️ Prérequis
-* Python 3.10+
+* Python 3.12+
 * Git
 
 ## 🚀 Installation & Démarrage (Local)

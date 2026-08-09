@@ -104,9 +104,15 @@
         .mobile-main {
             height: calc(100vh - 70px - 60px); /* 100vh - header - footer */
         }
+        .app-shell {
+            height: calc(100dvh - 70px);
+        }
         @media (min-width: 768px) {
             .mobile-main {
                 height: 100vh;
+            }
+            .app-shell {
+                height: calc(100dvh - 64px);
             }
         }
         /* Micro-interactions */
@@ -166,7 +172,7 @@
     </header>
 
     <!-- Unified Main Content (desktop: below topnav | mobile: between header & bottom-nav) -->
-    <div class="flex flex-col flex-1 overflow-y-auto" style="height: calc(100vh - 64px);">
+    <div class="app-shell flex flex-col min-h-0 overflow-hidden">
 
         <!-- Mobile Header (only shown on mobile, inside the flow) -->
         <header class="md:hidden bg-coffee-50/90 backdrop-blur-md border-b border-sage-100 px-4 flex items-center justify-center z-40 shrink-0 h-[70px]">
@@ -179,7 +185,7 @@
         </header>
 
         <!-- Single content block for ALL pages -->
-        <main class="flex-1 flex flex-col relative bg-transparent md:pb-0 pb-[60px]">
+        <main class="flex-1 min-h-0 flex flex-col relative bg-transparent md:pb-0 pb-[60px]">
             {% block content %}{% endblock %}
         </main>
 
@@ -242,7 +248,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Onboarding Logic
             const profile = localStorage.getItem('cn_profile');
-            if (!profile) {
+            const onboardingDismissed = localStorage.getItem('cn_onboarding_dismissed');
+            if (!profile && !onboardingDismissed) {
                 setTimeout(() => {
                     document.getElementById('onboarding-modal').classList.remove('hidden');
                 }, 1500);
@@ -258,6 +265,7 @@
         };
 
         function closeOnboarding() {
+            localStorage.setItem('cn_onboarding_dismissed', 'true');
             document.getElementById('onboarding-modal').classList.add('hidden');
         }
 
@@ -295,6 +303,7 @@
             profileData.last_updated = new Date().toISOString();
             
             localStorage.setItem('cn_profile', JSON.stringify(profileData));
+            localStorage.removeItem('cn_onboarding_dismissed');
             
             // Generate tasks for Carnet based on profile
             let tasks = JSON.parse(localStorage.getItem('cn_checklist')) || [];

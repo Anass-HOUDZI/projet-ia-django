@@ -6,6 +6,10 @@ import json
 import urllib.request
 import ssl
 
+from django.conf import settings
+from django.db import models
+
+
 class CommunityCategory(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
@@ -43,20 +47,33 @@ class CommunityPost(models.Model):
             print(f"[Discord Bot Warning] Webhook URL absente ou dummy : '{self.title}'")
             return False
 
-        category_name = str(self.category_slug).upper()
-        text_message = (
-            f"☕ **[GRANDE SALLE - {category_name}]**\n"
-            f"👤 **Auteur:** {self.author_name} ({self.author_role})\n"
-            f"📌 **Titre:** {self.title}\n"
-            f"💬 **Question:**\n> {self.content}\n\n"
-            f"👉 *Rejoindre et répondre : https://cafedesnations.fr/community/*"
-        )
-        
+        embed = {
+            "title": f"📢 NOUVELLE QUESTION EN GRANDE SALLE : {self.title}",
+            "description": self.content[:350] + ("..." if len(self.content) > 350 else ""),
+            "url": "https://cafedesnations.fr/community/",
+            "color": 15230000, # Terracotta #E8622C
+            "fields": [
+                {
+                    "name": "Catégorie",
+                    "value": self.category_slug.upper(),
+                    "inline": True
+                },
+                {
+                    "name": "Auteur",
+                    "value": f"{self.author_avatar} {self.author_name} ({self.author_role})",
+                    "inline": True
+                }
+            ],
+            "footer": {
+                "text": "Café des Nations • Bot Discord d'Entraide 🤖",
+            }
+        }
+
         payload = json.dumps({
             "username": "Le Barista",
             "content": text_message
         }).encode('utf-8')
-        
+
         try:
             context = ssl._create_unverified_context()
             req = urllib.request.Request(

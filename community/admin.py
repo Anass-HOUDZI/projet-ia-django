@@ -1,5 +1,7 @@
 from django.contrib import admin
+
 from .models import CommunityCategory, CommunityPost, CommunityReply
+
 
 @admin.register(CommunityCategory)
 class CommunityCategoryAdmin(admin.ModelAdmin):
