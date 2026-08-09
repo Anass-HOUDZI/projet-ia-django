@@ -7,18 +7,199 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import CommunityPost, CommunityReply
 
+def seed_initial_community_posts():
+    """
+    S'assure que les 6 questions de référence pour toutes les thématiques existent en base.
+    """
+    posts_data = [
+        {
+            "title": "Récépissé ANEF pas reçu après 2 mois de demande de renouvellement : que faire ?",
+            "content": "J'ai déposé mon dossier de renouvellement de VLS-TS étudiant sur l'ANEF il y a 2 mois à la préfecture de Lyon. Mon titre actuel expire dans 10 jours et je n'ai toujours pas reçu l'Attestation de Prolongation d'Instruction (API). Est-ce normal ?",
+            "category_slug": "demarches",
+            "author_name": "Youssef M.",
+            "author_role": "Habitué du Café",
+            "author_avatar": "🎓",
+            "likes_count": 18,
+            "replies": [
+                {
+                    "author_name": "Le Barista IA",
+                    "author_role": "Assistant IA Officiel",
+                    "author_avatar": "👨‍🍳",
+                    "content": "Bonjour Youssef ! Pas de panique. L'Attestation de Prolongation d'Instruction (API) est téléchargeable sur votre espace ANEF dès que la préfecture valide la complétude du dossier. À Lyon, le délai moyen d'instruction est de 6 à 8 semaines. Vous pouvez envoyer une relance polie via le formulaire de contact ANEF sans frais.",
+                    "is_official_answer": True
+                },
+                {
+                    "author_name": "Sonia K.",
+                    "author_role": "Guide Préfecture",
+                    "author_avatar": "🇩🇿",
+                    "content": "À Lyon ça prend souvent entre 6 et 8 semaines. Vérifie bien l'onglet 'Mes démarches' sur l'ANEF, l'attestation apparaît parfois directement sans notification !",
+                    "is_official_answer": False
+                }
+            ]
+        },
+        {
+            "title": "Garantie Visale refusée sans garant physique : quelles alternatives crédibles ?",
+            "content": "Je viens d'arriver pour un Master à Paris. Mon dossier Visale est validé mais le propriétaire exige malgré tout un garant physique résidant en France. Quels recours avez-vous utilisés dans ce cas ?",
+            "category_slug": "logement",
+            "author_name": "Amina K.",
+            "author_role": "Membre Récent",
+            "author_avatar": "🏠",
+            "likes_count": 14,
+            "replies": [
+                {
+                    "author_name": "Le Barista IA",
+                    "author_role": "Assistant IA Officiel",
+                    "author_avatar": "👨‍🍳",
+                    "content": "Bonjour Amina ! Rappelez au bailleur que la Garantie Visale est accordée par Action Logement, 100% gratuite et garantit les loyers impayés jusqu'à 36 mois sans franchise. Si le bailleur persiste, vous pouvez proposer des organismes agréés complémentaires comme Garantme ou Unkle, ou utiliser la caution bancaire.",
+                    "is_official_answer": True
+                },
+                {
+                    "author_name": "Amine T.",
+                    "author_role": "Mentor Logement",
+                    "author_avatar": "🔑",
+                    "content": "Tu peux lui envoyer la notice explicative Action Logement destinée aux propriétaires, cela rassure 90% des bailleurs hésitants !",
+                    "is_official_answer": False
+                }
+            ]
+        },
+        {
+            "title": "Changement de statut Étudiant vers Salarié / Passeport Talent : délai moyen de l'autorisation de travail ?",
+            "content": "J'ai signé une promesse d'embauche CDI en tant qu'ingénieur logiciel à Lille. Mon employeur a fait la demande d'autorisation de travail en ligne sur démarches-simplifiées. Combien de temps cela prend-il actuellement ?",
+            "category_slug": "emploi",
+            "author_name": "Mamadou S.",
+            "author_role": "Habitué du Café",
+            "author_avatar": "💼",
+            "likes_count": 22,
+            "replies": [
+                {
+                    "author_name": "Le Barista IA",
+                    "author_role": "Assistant IA Officiel",
+                    "author_avatar": "👨‍🍳",
+                    "content": "Bonjour Mamadou ! Félicitations pour votre CDI. Si votre rémunération brute annuelle est supérieure à 1,5 x le SMIC (environ 32 000€/an pour un diplôme de niveau Master), l'autorisation de travail est accordée de droit. Le délai moyen de délivrance de l'attestation préfectorale est de 3 à 4 semaines.",
+                    "is_official_answer": True
+                },
+                {
+                    "author_name": "Lucie V.",
+                    "author_role": "Guide Emploi",
+                    "author_avatar": "🇫🇷",
+                    "content": "Si ton salaire dépasse le seuil, la préfecture traite le dossier très vite. Garde bien ton récépissé de dépôt de changement de statut !",
+                    "is_official_answer": False
+                }
+            ]
+        },
+        {
+            "title": "Demande de bourse CROUS et repas à 1€ pour les étudiants internationaux : quelles conditions ?",
+            "content": "Est-ce que les étudiants internationaux hors-UE peuvent bénéficier du repas CROUS à 1€ et demander un logement en résidence universitaire si une place se libère en cours d'année ?",
+            "category_slug": "etudiant",
+            "author_name": "Olena K.",
+            "author_role": "Membre Récent",
+            "author_avatar": "🎓",
+            "likes_count": 16,
+            "replies": [
+                {
+                    "author_name": "Le Barista IA",
+                    "author_role": "Assistant IA Officiel",
+                    "author_avatar": "👨‍🍳",
+                    "content": "Bonjour Olena ! Oui ! Les étudiants non-boursiers en situation de précarité peuvent demander la tarification sociale à 1€ pour les repas CROUS en déposant un dossier sur la plateforme messervices.etudiant.gouv.fr. Pour les logements CROUS, les places désistées sont remises en ligne chaque semaine sur trouverunlogement.crous.fr.",
+                    "is_official_answer": True
+                },
+                {
+                    "author_name": "Karim M.",
+                    "author_role": "Ambassadeur Étudiant",
+                    "author_avatar": "🇲🇦",
+                    "content": "Fais ta demande d’évaluation sociale sur le site du CROUS de ton académie, l'accès au repas à 1€ est accordé très rapidement !",
+                    "is_official_answer": False
+                }
+            ]
+        },
+        {
+            "title": "Réductions transports Navigo / TER et Carte Avantage Jeune pour les démarches administratives",
+            "content": "Quelles sont les meilleures astuces et cartes de réduction pour voyager entre les préfectures régionales et son université à petit budget ?",
+            "category_slug": "bons_plans",
+            "author_name": "Carlos R.",
+            "author_role": "Habitué du Café",
+            "author_avatar": "💡",
+            "likes_count": 19,
+            "replies": [
+                {
+                    "author_name": "Le Barista IA",
+                    "author_role": "Assistant IA Officiel",
+                    "author_avatar": "👨‍🍳",
+                    "content": "Bonjour Carlos ! En Île-de-France, le forfait Imagine R Étudiant offre 50% de réduction sur les transports Navigo. Pour les déplacements régionaux en France, la Carte Avantage Jeune SNCF (49€/an) garantit -30% sur tous les TGV InOui et TER avec des prix plafonnés à 39€, 59€ et 79€.",
+                    "is_official_answer": True
+                },
+                {
+                    "author_name": "Inès B.",
+                    "author_role": "Mentor Bons Plans",
+                    "author_avatar": "🇲🇦",
+                    "content": "Achète la Carte Avantage lors des ventes flash SNCF (souvent à 25€), elle est amortie dès ton premier trajet !",
+                    "is_official_answer": False
+                }
+            ]
+        },
+        {
+            "title": "Validation du VLS-TS et taxe de séjour auprès de l'OFII : quelle est la procédure obligatoire ?",
+            "content": "Je suis arrivée en France avec un Visa Long Séjour valant Titre de Séjour (VLS-TS). Comment valider le visa et régler la taxe de séjour dans les 3 mois réglementaires ?",
+            "category_slug": "demarches",
+            "author_name": "Lina T.",
+            "author_role": "Membre Récent",
+            "author_avatar": "📄",
+            "likes_count": 25,
+            "replies": [
+                {
+                    "author_name": "Le Barista IA",
+                    "author_role": "Assistant IA Officiel",
+                    "author_avatar": "👨‍🍳",
+                    "content": "Bonjour Lina ! Bienvenue en France. La validation du VLS-TS s'effectue obligatoirement en ligne dans les 3 mois suivant votre arrivée sur le portail ANEF (rubrique 'Valider mon VLS-TS'). Vous y achèterez votre timbre fiscal dématérialisé (75€ pour les étudiants). À l'issue, l'OFII vous convoquera pour la visite médicale et la signature du Contrat d'Intégration Républicaine (CIR).",
+                    "is_official_answer": True
+                },
+                {
+                    "author_name": "David M.",
+                    "author_role": "Guide Intégration",
+                    "author_avatar": "🇨🇩",
+                    "content": "Fais-le dès la première semaine ! Tu auras ton attestation de confirmation de validation tout de suite, nécessaire pour valider ton inscription administrative à la fac.",
+                    "is_official_answer": False
+                }
+            ]
+        }
+    ]
+
+    for pdata in posts_data:
+        post, created = CommunityPost.objects.get_or_create(
+            title=pdata["title"],
+            defaults={
+                "content": pdata["content"],
+                "category_slug": pdata["category_slug"],
+                "author_name": pdata["author_name"],
+                "author_role": pdata["author_role"],
+                "author_avatar": pdata["author_avatar"],
+                "likes_count": pdata["likes_count"],
+                "sent_to_discord": True
+            }
+        )
+        if created:
+            for rdata in pdata["replies"]:
+                CommunityReply.objects.create(
+                    post=post,
+                    author_name=rdata["author_name"],
+                    author_role=rdata["author_role"],
+                    author_avatar=rdata["author_avatar"],
+                    content=rdata["content"],
+                    is_official_answer=rdata["is_official_answer"],
+                    sent_to_discord=True
+                )
+
 def ensure_community_tables():
     """
-    S'assure que les tables SQLite existent et sont peuplées, sinon exécute les migrations.
+    S'assure que les tables SQLite existent et contiennent tous les sujets de référence.
     """
     try:
-        if CommunityPost.objects.count() == 0:
-            seed_initial_community_posts()
+        seed_initial_community_posts()
     except Exception as e:
+        print("Initial seed attempt error:", e)
         try:
             call_command('migrate', 'community', interactive=False)
-            if CommunityPost.objects.count() == 0:
-                seed_initial_community_posts()
+            seed_initial_community_posts()
         except Exception as migrate_err:
             print("Auto migration community error:", migrate_err)
 
@@ -26,12 +207,8 @@ def index_view(request):
     """
     Renders the community landing page with database posts & Discord bot integration.
     """
-    try:
-        ensure_community_tables()
-        posts = CommunityPost.objects.all().prefetch_related('replies')
-    except Exception as e:
-        print("Index view database recovery:", e)
-        posts = []
+    ensure_community_tables()
+    posts = CommunityPost.objects.all().prefetch_related('replies')
     return render(request, 'community/index.html', {'db_posts': posts})
 
 @csrf_exempt
@@ -79,7 +256,6 @@ def api_posts(request):
             if not title or not content:
                 return JsonResponse({'status': 'error', 'message': 'Titre et contenu obligatoires'}, status=400)
 
-            # Creating CommunityPost fires Django post_save signal auto_notify_discord_on_create!
             post = CommunityPost.objects.create(
                 title=title,
                 content=content,
@@ -110,17 +286,15 @@ def api_discord_incoming_webhook(request):
             body = json.loads(request.body)
             content = body.get('content') or body.get('message') or body.get('title')
             username = body.get('username') or (body.get('author', {}).get('username') if isinstance(body.get('author'), dict) else 'Membre Discord')
-            
+
             if not content:
                 return JsonResponse({'status': 'ignored', 'message': 'Contenu vide'}, status=200)
 
-            # Prevent loops if message came from our own bot
             if 'Barista Discord Bot' in str(username):
                 return JsonResponse({'status': 'ignored', 'message': 'Bot message ignored'}, status=200)
 
             title = content[:80] + ("..." if len(content) > 80 else "")
 
-            # Create post with sent_to_discord=True to prevent loopback
             post = CommunityPost.objects.create(
                 title=title,
                 content=content,
@@ -190,40 +364,3 @@ def api_add_reply(request, post_id):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     return JsonResponse({'status': 'error'}, status=400)
-
-def seed_initial_community_posts():
-    p1 = CommunityPost.objects.create(
-        title="Combien de temps avant la fin de mon titre dois-je renouveler sur l'ANEF ?",
-        content="Mon titre de séjour étudiant expire dans 2 mois. J'ai entendu dire qu'il faut le faire à J-90. Est-ce trop tard ou est-ce que j'aurai une attestation de prolongation d'instruction (API) rapidement ?",
-        category_slug="demarches",
-        author_name="Youssef M.",
-        author_role="Habitué du Café",
-        author_avatar="🎓",
-        likes_count=18
-    )
-    CommunityReply.objects.create(
-        post=p1,
-        author_name="Le Barista IA",
-        author_role="Assistant IA Officiel",
-        author_avatar="👨‍🍳",
-        content="Bonjour Youssef ! Il est recommandé d'initier la demande sur l'ANEF entre J-90 et J-60. À 2 mois de l'échéance (J-60), vous êtes parfaitement dans les temps ! Déposez votre dossier dès aujourd'hui pour obtenir votre Attestation de Dépôt puis votre API sans rupture de droits.",
-        is_official_answer=True
-    )
-
-    p2 = CommunityPost.objects.create(
-        title="Garantie Visale refusée car diplôme étranger ? Comment valider ?",
-        content="J'essaie d'obtenir la caution Visale pour mon appartement à Lyon mais le site bloque sur la pièce justificative. Quel document avez-vous fourni pour débloquer le certificat ?",
-        category_slug="logement",
-        author_name="Amina K.",
-        author_role="Membre Récent",
-        author_avatar="🏠",
-        likes_count=12
-    )
-    CommunityReply.objects.create(
-        post=p2,
-        author_name="Sarah L.",
-        author_role="Mentor Logement",
-        author_avatar="🔑",
-        content="Il faut fournir votre certificat de scolarité provisoire ou votre attestation d'admission universitaire en France (Campus France), et votre visa VLS-TS avec tampon d'entrée !",
-        is_official_answer=False
-    )
