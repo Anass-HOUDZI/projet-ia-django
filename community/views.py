@@ -1,16 +1,30 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.management import call_command
 import json
 from .models import CommunityPost, CommunityReply, CommunityCategory
+
+def ensure_community_tables():
+    """
+    S'assure que les tables SQLite existent et sont peuplées, sinon exécute les migrations.
+    """
+    try:
+        if CommunityPost.objects.count() == 0:
+            seed_initial_community_posts()
+    except Exception as e:
+        try:
+            call_command('migrate', 'community', interactive=False)
+            if CommunityPost.objects.count() == 0:
+                seed_initial_community_posts()
+        except Exception as migrate_err:
+            print("Auto migration community error:", migrate_err)
 
 def index_view(request):
     """
     Renders the community landing page with database posts & Discord bot integration.
     """
-    if CommunityPost.objects.count() == 0:
-        seed_initial_community_posts()
-        
+    ensure_community_tables()
     posts = CommunityPost.objects.all().prefetch_related('replies')
     return render(request, 'community/index.html', {'db_posts': posts})
 
@@ -20,8 +34,7 @@ def api_posts(request):
     GET: List all posts from SQLite DB.
     POST: Create a new post & bridge notification to Discord Bot Webhook.
     """
-    if CommunityPost.objects.count() == 0:
-        seed_initial_community_posts()
+    ensure_community_tables()
 
     if request.method == 'GET':
         posts = CommunityPost.objects.all().prefetch_related('replies')
@@ -81,6 +94,19 @@ def api_posts(request):
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@csrf_exempt
+def api_sync_discord(request):
+    """
+    Synchronise les questions avec le serveur Discord via le Webhook Bot.
+    """
+    ensure_community_tables()
+    posts = CommunityPost.objects.all()
+    count = 0
+    for p in posts:
+        if p.notify_discord_bot():
+            count += 1
+    return JsonResponse({'status': 'success', 'synced_count': count, 'message': f'{count} question(s) transmise(s) à Discord !'})
 
 @csrf_exempt
 def api_like_post(request, post_id):

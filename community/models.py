@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 import json
 import urllib.request
+import ssl
 
 class CommunityCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -33,11 +34,11 @@ class CommunityPost(models.Model):
 
     def notify_discord_bot(self):
         """
-        Bridge Bot Discord : Envoie une notification formatée (Embed) au serveur Discord (via urllib.request).
+        Bridge Bot Discord : Envoie une notification formatée (Embed) au serveur Discord via Webhook.
         """
         webhook_url = getattr(settings, 'DISCORD_WEBHOOK_URL', '')
         if not webhook_url or 'dummy' in webhook_url:
-            print(f"[Discord Bot] Question enregistrée en BDD : '{self.title}' (Prêt pour webhook Discord)")
+            print(f"[Discord Bot Warning] Webhook URL absente ou dummy : '{self.title}'")
             return False
 
         embed = {
@@ -48,7 +49,7 @@ class CommunityPost(models.Model):
             "fields": [
                 {
                     "name": "Catégorie",
-                    "value": self.category_slug.upper(),
+                    "value": str(self.category_slug).upper(),
                     "inline": True
                 },
                 {
@@ -63,17 +64,20 @@ class CommunityPost(models.Model):
         }
         
         payload = json.dumps({
+            "content": f"☕ **Nouvelle question posée par {self.author_name} en Grande Salle !**",
             "username": "Le Barista Discord Bot ☕",
             "embeds": [embed]
         }).encode('utf-8')
         
         try:
+            context = ssl._create_unverified_context()
             req = urllib.request.Request(
                 webhook_url,
                 data=payload,
                 headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'}
             )
-            with urllib.request.urlopen(req, timeout=4) as response:
+            with urllib.request.urlopen(req, context=context, timeout=6) as response:
+                print(f"[Discord Bot Success] Webhook response status: {response.status} pour '{self.title}'")
                 if response.status in [200, 204]:
                     self.sent_to_discord = True
                     self.save(update_fields=['sent_to_discord'])
