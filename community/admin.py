@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Group, Thread, Post, AIModerationLog
+
+from .models import AIModerationLog, Group, Post, Thread
 
 admin.site.register(Group)
 admin.site.register(Thread)

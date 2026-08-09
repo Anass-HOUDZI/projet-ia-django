@@ -1,6 +1,7 @@
 from django.contrib import admin
-from django.urls import path, include
-from ehlo.views import index, carnet, mentions_legales
+from django.urls import include, path
+
+from ehlo.views import carnet, index, mentions_legales
 
 urlpatterns = [
     path("admin/", admin.site.urls),

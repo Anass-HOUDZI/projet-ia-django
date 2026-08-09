@@ -1,6 +1,8 @@
 import openai
 from django.conf import settings
+
 from .models import Message
+
 
 class ChatbotService:
     def __init__(self):
@@ -11,7 +13,7 @@ class ChatbotService:
         )
         # Modèle par défaut (Mistral)
         self.model = "mistral-large-latest"
-        
+
         self.system_prompt = (
             "Tu es le 'Barista', l'Assistant IA chaleureux et complice du 'Café des Nations'. "
             "Ton rôle est d'aider les étrangers en France avec leurs démarches administratives, tout en gardant un ton rassurant et bienveillant. "
@@ -30,10 +32,10 @@ class ChatbotService:
         """
         # Récupérer l'historique des messages
         db_messages = conversation.messages.order_by('timestamp')
-        
+
         # Préparer les messages pour l'API
         api_messages = [{"role": "system", "content": self.system_prompt}]
-        
+
         # Si current_message est fourni, le dernier message db (qui vient d'être sauvegardé) doit être ignoré dans la boucle
         db_messages_list = list(db_messages)
         if current_message and db_messages_list:
@@ -69,7 +71,7 @@ class ChatbotService:
                 temperature=0.3, # Faible créativité pour des réponses factuelles
             )
             ai_content = response.choices[0].message.content
-            
+
             # Sauvegarder la réponse en base
             Message.objects.create(
                 conversation=conversation,
@@ -77,7 +79,7 @@ class ChatbotService:
                 content=ai_content
             )
             return ai_content
-            
+
         except Exception as e:
             # Fallback en cas d'erreur API
             error_msg = f"Erreur de connexion à l'IA : {str(e)}"

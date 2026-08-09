@@ -1,6 +1,8 @@
-from django.shortcuts import render
 from django.http import JsonResponse
+from django.shortcuts import render
+
 from .models import AdministrativePOI
+
 
 def map_view(request):
     """
@@ -15,7 +17,7 @@ def api_pois(request):
     """
     if AdministrativePOI.objects.count() < 26:
         AdministrativePOI.objects.all().delete()
-        
+
         AdministrativePOI.objects.bulk_create([
             # ==================== PARIS & ÎLE-DE-FRANCE ====================
             AdministrativePOI(
@@ -330,7 +332,7 @@ def api_pois(request):
                 wait_time_minutes=30
             ),
         ])
-    
+
     pois = AdministrativePOI.objects.all()
     data = [{
         'id': p.id,
@@ -344,5 +346,5 @@ def api_pois(request):
         'services_offered': p.services_offered,
         'wait_time_minutes': p.wait_time_minutes
     } for p in pois]
-    
+
     return JsonResponse({'status': 'success', 'pois': data})
