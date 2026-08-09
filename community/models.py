@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import json
 import urllib.request
 import ssl
@@ -80,7 +82,7 @@ class CommunityPost(models.Model):
                 print(f"[Discord Bot Success] Webhook response status: {response.status} pour '{self.title}'")
                 if response.status in [200, 204]:
                     self.sent_to_discord = True
-                    self.save(update_fields=['sent_to_discord'])
+                    CommunityPost.objects.filter(id=self.id).update(sent_to_discord=True)
                     return True
         except Exception as e:
             print("[Discord Bot Error]:", e)
@@ -97,3 +99,11 @@ class CommunityReply(models.Model):
 
     def __str__(self):
         return f"Réponse à {self.post.title} par {self.author_name}"
+
+@receiver(post_save, sender=CommunityPost)
+def auto_notify_discord_on_create(sender, instance, created, **kwargs):
+    """
+    Signal automatique : Déclenche la synchronisation Discord instantanée dès création d'une question.
+    """
+    if created and not instance.sent_to_discord:
+        instance.notify_discord_bot()
