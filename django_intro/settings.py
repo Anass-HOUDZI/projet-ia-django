@@ -32,6 +32,8 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-cafedesnations-key-2026'
 
 MISTRAL_API_KEY = env('MISTRAL_API_KEY', default='')
 
+DISCORD_WEBHOOK_URL = env('DISCORD_WEBHOOK_URL', default='https://discord.com/api/webhooks/1536010953169309746/l4tWfITWRauz_9jNRTmXbgn680_UY86BRla_wJYiUk0ToxUSxP7Fa1THVopQLE5AyiOn')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=True)
 
