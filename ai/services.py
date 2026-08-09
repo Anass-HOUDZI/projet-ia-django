@@ -25,6 +25,26 @@ class ChatbotService:
             "5. Demande des précisions sur le profil si besoin (étudiant, passeport talent, etc.) de manière conversationnelle."
         )
 
+    def generate_community_answer(self, title, content):
+        """
+        Génère une réponse automatique d'entraide pour une question posée dans la Grande Salle.
+        """
+        prompt = f"Un utilisateur pose la question suivante dans la Grande Salle de la communauté :\nTitre : {title}\nQuestion : {content}\n\nDonne une réponse claire, bienveillante et juridiquement exacte en 2-3 paragraphes concis."
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": prompt}
+        ]
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=0.3,
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            print("Error generating Mistral community answer:", e)
+            return "Bonjour ! Merci pour votre question. Le Barista vous recommande de consulter les fiches officielles sur service-public.fr ou ANEF."
+
     def generate_response(self, conversation, current_message=None, image_base64=None):
         """
         Génère une réponse à partir de l'historique de la conversation.
