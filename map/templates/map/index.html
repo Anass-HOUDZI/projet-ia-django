@@ -62,7 +62,7 @@
 {% endblock %}
 
 {% block content %}
-    <main class="flex-1 relative overflow-hidden flex flex-col md:flex-row" style="height: calc(100vh - 64px);">
+    <main class="flex-1 min-h-0 relative overflow-hidden flex flex-col md:flex-row">
         
         <!-- Left Side Bar / Directory Panel -->
         <aside id="directory-panel" class="w-full md:w-96 bg-white border-r border-sage-100 z-20 flex flex-col shrink-0 shadow-sm h-72 md:h-full">
@@ -87,7 +87,7 @@
         </aside>
 
         <!-- Main Map Area -->
-        <section class="flex-1 relative h-full w-full">
+        <section class="flex-1 min-h-0 relative h-full w-full">
             <div id="map" class="w-full h-full z-10 relative"></div>
             
             <!-- Top Floating Controls Header -->
