@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import CommunityPost, CommunityReply
+from community.models import CommunityPost, CommunityReply
 
 def seed_initial_community_posts():
     """
@@ -406,29 +406,34 @@ def seed_initial_community_posts():
     ]
 
     for pdata in posts_data:
+        likes_val = pdata.get("likes_count", 0)
+        likes_num = likes_val if isinstance(likes_val, int) else 0
         post, created = CommunityPost.objects.get_or_create(
-            title=pdata["title"],
+            title=str(pdata["title"]),
             defaults={
-                "content": pdata["content"],
-                "category_slug": pdata["category_slug"],
-                "author_name": pdata["author_name"],
-                "author_role": pdata["author_role"],
-                "author_avatar": pdata["author_avatar"],
-                "likes_count": pdata["likes_count"],
+                "content": str(pdata["content"]),
+                "category_slug": str(pdata["category_slug"]),
+                "author_name": str(pdata["author_name"]),
+                "author_role": str(pdata["author_role"]),
+                "author_avatar": str(pdata["author_avatar"]),
+                "likes_count": likes_num,
                 "sent_to_discord": True
             }
         )
         if created:
-            for rdata in pdata["replies"]:
-                CommunityReply.objects.create(
-                    post=post,
-                    author_name=rdata["author_name"],
-                    author_role=rdata["author_role"],
-                    author_avatar=rdata["author_avatar"],
-                    content=rdata["content"],
-                    is_official_answer=rdata["is_official_answer"],
-                    sent_to_discord=True
-                )
+            replies = pdata.get("replies")
+            if isinstance(replies, list):
+                for rdata in replies:
+                    if isinstance(rdata, dict):
+                        CommunityReply.objects.create(
+                            post=post,
+                            author_name=str(rdata.get("author_name", "")),
+                            author_role=str(rdata.get("author_role", "")),
+                            author_avatar=str(rdata.get("author_avatar", "")),
+                            content=str(rdata.get("content", "")),
+                            is_official_answer=bool(rdata.get("is_official_answer", False)),
+                            sent_to_discord=True
+                        )
 
 def ensure_community_tables():
     """

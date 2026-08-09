@@ -1,7 +1,7 @@
 [project]
 name = "django-intro"
 version = "0.1.0"
-description = "Add your description here"
+description = "Café des Nations - Django Project"
 readme = "README.md"
 authors = [
     { name = "aptitek", email = "aptitek@users.noreply.github.com" }
@@ -15,9 +15,15 @@ dependencies = [
     "whitenoise>=6.6.0",
 ]
 
-[project.scripts]
-django-intro = "django_intro:main"
+[tool.pyrefly]
+import-roots = ["."]
+search-paths = ["."]
+ignore-missing-imports = true
+reportUntypedImport = false
+reportMissingImports = false
 
-[build-system]
-requires = ["uv_build>=0.12.1,<0.13.0"]
-build-backend = "uv_build"
+[tool.pyright]
+include = ["."]
+extraPaths = ["."]
+reportMissingImports = false
+reportUntypedImport = false

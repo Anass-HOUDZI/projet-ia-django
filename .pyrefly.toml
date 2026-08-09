@@ -1,0 +1,11 @@
+project-root = "."
+import-roots = ["."]
+search-paths = ["."]
+
+[rules]
+untyped-import = "off"
+missing-import = "off"
+missing-attribute = "off"
+bad-argument-type = "off"
+not-iterable = "off"
+bad-index = "off"

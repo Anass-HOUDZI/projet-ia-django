@@ -1,0 +1,6 @@
+{
+  "import_roots": ["."],
+  "search_paths": ["."],
+  "ignore_missing_imports": true,
+  "report_untyped_import": false
+}

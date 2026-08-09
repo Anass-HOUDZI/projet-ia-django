@@ -5,12 +5,11 @@ from django.dispatch import receiver
 import json
 import urllib.request
 import ssl
-
-from django.conf import settings
-from django.db import models
-
+import threading
 
 class CommunityCategory(models.Model):
+    objects = models.Manager()
+
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
     icon = models.CharField(max_length=10, default='💬')
@@ -20,6 +19,8 @@ class CommunityCategory(models.Model):
         return f"{self.icon} {self.name}"
 
 class CommunityPost(models.Model):
+    objects = models.Manager()
+
     category = models.ForeignKey(CommunityCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     author_name = models.CharField(max_length=100, default='Anonyme')
     author_role = models.CharField(max_length=100, default='Habitué du Café')
@@ -79,6 +80,8 @@ class CommunityPost(models.Model):
         return False
 
 class CommunityReply(models.Model):
+    objects = models.Manager()
+
     post = models.ForeignKey(CommunityPost, on_delete=models.CASCADE, related_name='replies')
     author_name = models.CharField(max_length=100, default='Barista IA')
     author_role = models.CharField(max_length=100, default='Mentor Certifié')
@@ -130,8 +133,6 @@ class CommunityReply(models.Model):
         except Exception as e:
             print("[Discord Reply Bot Error]:", e)
         return False
-
-import threading
 
 @receiver(post_save, sender=CommunityPost)
 def auto_notify_discord_on_create(sender, instance, created, **kwargs):
